@@ -1,11 +1,11 @@
 # China Travel Plan
 
-旅行攻略网页集合。
+四地旅行 HTML 静态站，包含香港、重庆、横店、义乌四个旅行子页。
 
-## 已发布
+- 主页：`index.html`
+- 香港两日旅行安排：`hongkong.html`
+- 重庆三日旅行安排：`chongqing.html`
+- 横店两日旅行安排：`hengdian.html`
+- 义乌购物旅行报告：`yiwu.html`
 
-- 义乌购物旅行报告：`index.html`
-
-## 内容说明
-
-当前页面包含义乌两天一夜购物路线、国际商贸城分区逛法、交通住宿、美食建议、避雷清单和攻略图片信息。图片素材来自用户提供的小红书攻略链接整理，仅用于个人旅行规划参考。
+GitHub Pages: https://leopenguic.github.io/China_travel_plan/
