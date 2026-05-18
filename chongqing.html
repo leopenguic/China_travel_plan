@@ -28,6 +28,226 @@
   <div class="section-head"><h2>三天线路总览</h2></div>
   <div class="card-grid"><article class="card"><h3>线路</h3><p>解放碑周边山城步道、十八梯、洪崖洞夜景串成高低步行线。</p></article><article class="card"><h3>交通</h3><p>主城轨道交通+步行，坡多时网约车补短板；去南山建议打车。</p></article><article class="card"><h3>饮食</h3><p>火锅 1-2 顿即可，搭配小面、油茶、糯米团、凉糕/凉虾。</p></article></div>
 </section>
+<section class="section map-section" id="cq-map-section">
+  <div class="section-head">
+    <h2>重庆地图路线</h2>
+    <p class="section-intro">把主城两天和武隆一日游拆成 3 条可视化路线，点位、交通、顺路吃喝和避雷一起看。</p>
+  </div>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <div class="map-tools" role="group" aria-label="切换重庆地图路线日期">
+    <button class="map-day-btn active" type="button" data-day="day1">Day 1 渝中 City Walk</button><button class="map-day-btn " type="button" data-day="day2">Day 2 武隆一日游</button><button class="map-day-btn " type="button" data-day="day3">Day 3 轻轨南岸夜景</button>
+  </div>
+  <div class="day-route-actions" id="cq-day-route-actions"></div>
+  <div class="map-layout">
+    <div class="map-card">
+      <div id="cq-map" class="travel-map" aria-label="重庆旅行点位地图"></div>
+      <p class="map-fallback">如果地图瓦片加载失败，下面的点位和路线文字仍然可用；实时路线请点击外部地图导航。</p>
+    </div>
+    <aside class="place-panel" aria-live="polite">
+      <div class="place-detail" id="cq-place-detail"></div>
+      <div class="place-list" id="cq-place-list"></div>
+    </aside>
+  </div>
+  <div class="route-panel" id="cq-route-panel"></div>
+</section>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const TRAVEL_MAP_DATA_CQ = {"day1": {"label": "Day 1 渝中 City Walk", "city": "重庆", "center": [29.5594, 106.5583], "zoom": 13, "routeSummary": "解放碑 -> 魁星楼 -> 大井巷 -> 山城步道 -> 十八梯 -> 大剧院江滩", "mainRoute": ["jiefangbei", "kuixinglou", "dajingxiang", "shancheng-trail", "shibati", "grand-theatre-river"], "navRoute": ["jiefangbei", "kuixinglou", "dajingxiang", "shancheng-trail", "shibati", "grand-theatre-river"], "routeNote": "重庆站内线条只表示上下半城大方向；真实步行会有坡道、楼梯和立体交通，转场当天以百度/高德为准。", "places": [{"id": "jiefangbei", "name": "解放碑/八一路", "type": "景点", "lat": 29.563, "lng": 106.5767, "address": "重庆市渝中区解放碑步行街", "stay": "45-75 分钟", "note": "适合放行李后开场，八一路小吃街只做补给，不要在第一顿吃太撑。", "recommend": "小面、酸辣粉、烤苕皮、冰粉少量尝试。"}, {"id": "kuixinglou", "name": "魁星楼", "type": "景点", "lat": 29.5668, "lng": 106.5746, "address": "重庆市渝中区临江门魁星楼", "stay": "20-35 分钟", "note": "看“22 楼也是 1 楼”的山城错觉，上午人相对少。", "recommend": "拍完就走，别在楼梯口堵人。"}, {"id": "dajingxiang", "name": "大井巷/午餐区", "type": "餐厅", "lat": 29.5629, "lng": 106.5712, "address": "重庆市渝中区大井巷", "stay": "60-90 分钟", "note": "比洪崖洞内部更适合吃饭休息，午餐优先江湖菜或轻量火锅。", "recommend": "江湖菜、蹄花汤、小面；火锅控制辣度。"}, {"id": "shancheng-trail", "name": "山城步道", "type": "景点", "lat": 29.5527, "lng": 106.5633, "address": "重庆市渝中区山城巷", "stay": "60-90 分钟", "note": "建议从高处往低处走，穿防滑鞋，别拖行李箱。", "recommend": "沿途小店买水即可，不建议边爬坡边吃重辣。"}, {"id": "shibati", "name": "十八梯", "type": "景点", "lat": 29.557, "lng": 106.5686, "address": "重庆市渝中区十八梯传统风貌区", "stay": "45-75 分钟", "note": "商业化更强，适合下午休息和拍夜灯前的街区。", "recommend": "冰粉、凉虾可以解辣，别连续喝奶茶。"}, {"id": "hongyadong", "name": "洪崖洞外景", "type": "夜景", "lat": 29.5639, "lng": 106.587, "address": "重庆市渝中区嘉陵江滨江路88号", "stay": "20-40 分钟", "note": "建议只看外景，不要钻进内部电梯人流。", "recommend": "拍外景即可，内部餐饮性价比不高。"}, {"id": "grand-theatre-river", "name": "大剧院江滩", "type": "夜景", "lat": 29.5722, "lng": 106.5867, "address": "重庆市江北区重庆大剧院附近江滩", "stay": "40-70 分钟", "note": "看洪崖洞外景更轻松的收尾点，6 号线大剧院站 4 号口方向。", "recommend": "晚餐不要安排太远，夜景后直接回酒店更舒服。"}], "segments": [{"from": "解放碑", "to": "魁星楼", "mode": "步行", "time": "10-15 分钟", "food": "八一路只浅尝小吃，别第一站吃到走不动。", "tip": "导航显示近但可能上下楼，跟着现场指示走。", "focus": ["jiefangbei", "kuixinglou"]}, {"from": "魁星楼", "to": "大井巷午餐", "mode": "步行或短打车", "time": "15-25 分钟", "food": "午餐选江湖菜/蹄花/小面，火锅放晚上或 Day 3。", "tip": "山城中午暴晒，别硬爬坡找网红店。", "focus": ["kuixinglou", "dajingxiang"]}, {"from": "大井巷", "to": "山城步道", "mode": "步行到高处入口", "time": "15-30 分钟", "food": "买水，重辣小吃留到下坡后。", "tip": "穿防滑鞋，行李箱非常不适合。", "focus": ["dajingxiang", "shancheng-trail"]}, {"from": "山城步道", "to": "十八梯", "mode": "步行下坡", "time": "25-45 分钟", "food": "十八梯可补冰粉/凉虾。", "tip": "膝盖不舒服就短打车，不要硬走全程。", "focus": ["shancheng-trail", "shibati"]}, {"from": "十八梯", "to": "大剧院江滩", "mode": "轨道 1/6 号线 + 步行", "time": "35-55 分钟", "food": "晚餐若吃火锅，先吃再去夜景；夜景后别再跨城排队。", "tip": "洪崖洞内部人多，大剧院江滩看外景更稳。", "focus": ["shibati", "hongyadong", "grand-theatre-river"]}]}, "day2": {"label": "Day 2 武隆一日游", "city": "重庆 武隆", "center": [29.4025, 107.7628], "zoom": 9, "routeSummary": "主城酒店 -> 重庆北/西站 -> 武隆站 -> 仙女镇游客中心 -> 天生三桥 -> 龙水峡地缝/仙女山 -> 返程", "mainRoute": ["hotel-area", "cq-north", "wulong-station", "xiannv-town", "tiansheng-sanqiao", "longshuixia", "fairy-mountain"], "navRoute": ["hotel-area", "cq-north", "wulong-station", "xiannv-town", "tiansheng-sanqiao", "longshuixia"], "routeNote": "武隆线是跨城示意线，不代表真实道路折线；车票、接驳和景区换乘以当天官方/地图 App 为准。", "places": [{"id": "hotel-area", "name": "解放碑/较场口酒店区", "type": "区域", "lat": 29.5598, "lng": 106.5738, "address": "重庆市渝中区解放碑/较场口一带", "stay": "清晨出发", "note": "提前一晚收拾轻装包，早餐外带。", "recommend": "便利店早餐、小面少辣版；别吃太油。"}, {"id": "cq-north", "name": "重庆北站/重庆西站", "type": "交通", "lat": 29.6108, "lng": 106.5502, "address": "重庆北站或重庆西站", "stay": "提前 45-60 分钟到", "note": "以实际车票车站为准，别临时跑错站。", "recommend": "提前买往返票，节假日尽量不赌现场余票。"}, {"id": "wulong-station", "name": "武隆站", "type": "交通", "lat": 29.3232, "lng": 107.7561, "address": "重庆市武隆区武隆站", "stay": "接驳转场", "note": "到站后去仙女镇游客中心或跟正规一日游集合。", "recommend": "确认返程车次和末班接驳。"}, {"id": "xiannv-town", "name": "仙女镇游客中心", "type": "交通", "lat": 29.4219, "lng": 107.7609, "address": "重庆市武隆区仙女山镇游客中心", "stay": "换乘景区车", "note": "景区换乘核心点，票务和接驳都在这里确认。", "recommend": "午餐简单吃，别耽误下午景区。"}, {"id": "tiansheng-sanqiao", "name": "天生三桥", "type": "景点", "lat": 29.425, "lng": 107.7924, "address": "重庆市武隆区天生三桥景区", "stay": "2-3 小时", "note": "武隆核心景点，电梯、天龙桥、青龙桥、黑龙桥一路走。", "recommend": "穿防滑鞋，带雨衣/薄外套。"}, {"id": "longshuixia", "name": "龙水峡地缝", "type": "景点", "lat": 29.3902, "lng": 107.7708, "address": "重庆市武隆区龙水峡地缝景区", "stay": "1.5-2.5 小时", "note": "体力好选这里，峡谷湿滑，雨天谨慎。", "recommend": "地缝和仙女山二选一，别都硬塞。"}, {"id": "fairy-mountain", "name": "仙女山", "type": "景点", "lat": 29.4795, "lng": 107.765, "address": "重庆市武隆区仙女山国家森林公园", "stay": "2-3 小时", "note": "想轻松拍草地、带老人小孩更适合。", "recommend": "天气差就放弃远景拍照，早点返程。"}], "segments": [{"from": "主城酒店", "to": "火车站", "mode": "轨道或网约车", "time": "35-70 分钟", "food": "早餐外带，避免辛辣油腻。", "tip": "重庆北/西/东别看错，按车票走。", "focus": ["hotel-area", "cq-north"]}, {"from": "火车站", "to": "武隆站", "mode": "动车/高铁或正规直通车", "time": "约 1.5-2 小时", "food": "车上轻食即可。", "tip": "节假日提前买往返票，一日团选正规平台。", "focus": ["cq-north", "wulong-station"]}, {"from": "武隆站", "to": "天生三桥", "mode": "景区接驳/包车/一日团车", "time": "60-90 分钟", "food": "仙女镇简单午餐，不为网红店绕路。", "tip": "景区车和门票分开确认。", "focus": ["wulong-station", "xiannv-town", "tiansheng-sanqiao"]}, {"from": "天生三桥", "to": "地缝或仙女山", "mode": "景区车/包车", "time": "30-60 分钟", "food": "补水和干粮比正餐重要。", "tip": "当天只二选一，体力不够就早点返程。", "focus": ["tiansheng-sanqiao", "longshuixia", "fairy-mountain"]}]}, "day3": {"label": "Day 3 轻轨南岸夜景", "city": "重庆", "center": [29.5487, 106.5466], "zoom": 12, "routeSummary": "鹅岭/佛图关 -> 李子坝 -> 三峡博物馆 -> 观音桥/北仓 -> 龙门浩/下浩里 -> 南山夜景火锅", "mainRoute": ["eling", "liziba", "three-gorges", "beicang", "longmenhao", "xiahaoli", "nanshan-hotpot"], "navRoute": ["eling", "liziba", "three-gorges", "beicang", "longmenhao", "nanshan-hotpot"], "places": [{"id": "eling", "name": "鹅岭公园/佛图关", "type": "景点", "lat": 29.5528, "lng": 106.5367, "address": "重庆市渝中区鹅岭正街176号", "stay": "60-90 分钟", "note": "两个公园选一个即可，早上人少，适合轻量爬坡。", "recommend": "早餐吃小面、油茶或糯米团。"}, {"id": "liziba", "name": "李子坝观景平台", "type": "景点", "lat": 29.5522, "lng": 106.5457, "address": "重庆市渝中区李子坝正街", "stay": "20-35 分钟", "note": "先去观景平台，别在站内通道久拍。", "recommend": "拍轻轨穿楼即可，不用买贵的周边。"}, {"id": "three-gorges", "name": "三峡博物馆/人民大礼堂", "type": "景点", "lat": 29.5632, "lng": 106.5516, "address": "重庆市渝中区人民路236号", "stay": "90-150 分钟", "note": "雨天和暴晒天很适合作为室内调整。", "recommend": "附近午餐选清淡些，下午还要转场。"}, {"id": "beicang", "name": "北仓/观音桥", "type": "区域", "lat": 29.5803, "lng": 106.5334, "address": "重庆市江北区北仓文创街区/观音桥", "stay": "60-120 分钟", "note": "咖啡、小店、商圈补给，别把购物任务放太大。", "recommend": "咖啡、酸奶牛、凉糕凉虾。"}, {"id": "longmenhao", "name": "龙门浩老街", "type": "景点", "lat": 29.5532, "lng": 106.5906, "address": "重庆市南岸区南滨路龙门浩老街", "stay": "60-90 分钟", "note": "老街、坡道、江景密集，傍晚光线好。", "recommend": "咖啡店/轻食做休息点。"}, {"id": "xiahaoli", "name": "下浩里", "type": "景点", "lat": 29.5506, "lng": 106.5907, "address": "重庆市南岸区下浩里老街", "stay": "45-75 分钟", "note": "和龙门浩顺路，雨天石阶湿滑。", "recommend": "拍照多，正餐留给南山火锅。"}, {"id": "nanshan-hotpot", "name": "南山夜景火锅", "type": "餐厅", "lat": 29.53, "lng": 106.6158, "address": "重庆市南岸区南山街道一带", "stay": "90-150 分钟", "note": "从上新街/龙门浩打车上山最省心。", "recommend": "夜景火锅、鸳鸯锅；不能吃辣就微辣。"}], "segments": [{"from": "鹅岭/佛图关", "to": "李子坝", "mode": "轨道 2 号线或步行下坡", "time": "15-30 分钟", "food": "早餐小面/油茶，别空腹爬坡。", "tip": "两个公园选一个，别上午就走崩。", "focus": ["eling", "liziba"]}, {"from": "李子坝", "to": "三峡博物馆", "mode": "轨道 + 步行", "time": "25-40 分钟", "food": "午餐选轻量川菜或面食。", "tip": "博物馆预约/开放状态当天确认。", "focus": ["liziba", "three-gorges"]}, {"from": "三峡博物馆", "to": "北仓/观音桥", "mode": "轨道或短打车", "time": "25-40 分钟", "food": "咖啡、凉糕、酸奶牛做下午补给。", "tip": "观音桥商圈很大，控制购物时间。", "focus": ["three-gorges", "beicang"]}, {"from": "观音桥", "to": "龙门浩/下浩里", "mode": "轨道到上新街 + 步行", "time": "45-65 分钟", "food": "老街咖啡轻食即可。", "tip": "坡道多，雨天防滑。", "focus": ["beicang", "longmenhao", "xiahaoli"]}, {"from": "下浩里", "to": "南山夜景火锅", "mode": "网约车", "time": "20-35 分钟", "food": "夜景火锅收尾，别再安排第二场。", "tip": "南山回程打车可能排队，提前叫车。", "focus": ["xiahaoli", "nanshan-hotpot"]}]}};
+(function initTravelMap() {
+  const cityKey = "cq";
+  const recommendLabel = "推荐吃什么";
+  const routeColor = "#b23a2e";
+  const dataByDay = TRAVEL_MAP_DATA_CQ;
+  const detail = document.getElementById(`${cityKey}-place-detail`);
+  const list = document.getElementById(`${cityKey}-place-list`);
+  const routes = document.getElementById(`${cityKey}-route-panel`);
+  const dayRouteActions = document.getElementById(`${cityKey}-day-route-actions`);
+  const section = document.getElementById(`${cityKey}-map-section`);
+  const buttons = section ? Array.from(section.querySelectorAll(".map-day-btn")) : [];
+  if (!detail || !list || !routes || !dayRouteActions || !section) return;
+
+  let currentDay = Object.keys(dataByDay)[0];
+  let map = null;
+  let layer = null;
+  let routeLine = null;
+  let routeHalo = null;
+  let markers = {};
+
+  const typeClass = {"景点":"spot","餐厅":"food","小吃甜品":"sweet","交通":"transport","购物":"shopping","园区":"park","夜景":"night","区域":"area"};
+  const typeLabel = {"景点":"景","餐厅":"餐","小吃甜品":"甜","交通":"行","购物":"购","园区":"园","夜景":"夜","区域":"区"};
+
+  function mapSearchUrl(provider, place) {
+    const query = encodeURIComponent(`${place.name} ${place.address}`);
+    if (provider === "google") return `https://www.google.com/maps/search/?api=1&query=${query}`;
+    if (provider === "baidu") return `https://map.baidu.com/search/${query}`;
+    return `https://uri.amap.com/search?keyword=${query}`;
+  }
+
+  function dayRouteUrl(provider, data) {
+    const routeIds = data.navRoute || data.mainRoute;
+    const points = routeIds.map(id => data.places.find(place => place.id === id)).filter(Boolean);
+    const routeText = data.routeSummary || points.map(place => place.name).join(" -> ");
+    if (!points.length) return "#";
+    if (provider === "google") {
+      const origin = encodeURIComponent(`${points[0].name} ${points[0].address}`);
+      const destination = encodeURIComponent(`${points[points.length - 1].name} ${points[points.length - 1].address}`);
+      const waypoints = points.slice(1, -1).map(place => `${place.name} ${place.address}`).join("|");
+      return `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&waypoints=${encodeURIComponent(waypoints)}&travelmode=walking`;
+    }
+    const query = encodeURIComponent(`${data.city || ""} ${routeText}`);
+    if (provider === "baidu") return `https://map.baidu.com/search/${query}`;
+    return `https://uri.amap.com/search?keyword=${query}`;
+  }
+
+  function renderDetail(place) {
+    detail.innerHTML = `
+      <span class="place-type ${typeClass[place.type] || "spot"}">${place.type}</span>
+      <h3>${place.name}</h3>
+      <p>${place.note}</p>
+      <dl>
+        <dt>地址</dt><dd>${place.address}</dd>
+        <dt>建议停留</dt><dd>${place.stay}</dd>
+        ${place.recommend ? `<dt>${recommendLabel}</dt><dd>${place.recommend}</dd>` : ""}
+      </dl>
+      <div class="nav-links">
+        <a href="${mapSearchUrl("google", place)}" target="_blank" rel="noopener">Google</a>
+        <a href="${mapSearchUrl("baidu", place)}" target="_blank" rel="noopener">百度</a>
+        <a href="${mapSearchUrl("amap", place)}" target="_blank" rel="noopener">高德</a>
+      </div>`;
+  }
+
+  function iconFor(place) {
+    return L.divIcon({
+      className: `travel-marker ${typeClass[place.type] || "spot"}`,
+      html: `<span>${typeLabel[place.type] || "点"}</span>`,
+      iconSize: [30, 30],
+      iconAnchor: [15, 15]
+    });
+  }
+
+  function focusPlaces(ids) {
+    if (!map || !ids || !ids.length) return;
+    const points = ids.map(id => markers[id]).filter(Boolean).map(marker => marker.getLatLng());
+    if (points.length === 1) map.setView(points[0], 16);
+    if (points.length > 1) map.fitBounds(L.latLngBounds(points), {padding: [42, 42]});
+  }
+
+  function routePoints(data) {
+    return (data.mainRoute || [])
+      .map(id => data.places.find(place => place.id === id))
+      .filter(Boolean)
+      .map(place => [place.lat, place.lng]);
+  }
+
+  function fitMainRoute(data) {
+    if (!map) return;
+    const points = routePoints(data);
+    if (points.length > 1) map.fitBounds(L.latLngBounds(points), {padding: [34, 34]});
+  }
+
+  function drawMainRoute(data) {
+    if (!map) return;
+    if (routeLine) routeLine.remove();
+    if (routeHalo) routeHalo.remove();
+    const points = routePoints(data);
+    if (points.length < 2) return;
+    routeHalo = L.polyline(points, {color:"#ffffff", weight:9, opacity:.9, lineJoin:"round"}).addTo(map);
+    routeLine = L.polyline(points, {color:routeColor, weight:5, opacity:.92, lineJoin:"round"}).addTo(map);
+    routeLine.bringToBack();
+    routeHalo.bringToBack();
+  }
+
+  function renderDayRouteActions(data) {
+    dayRouteActions.innerHTML = `
+      <div class="route-summary">
+        <strong>整日主路线</strong>
+        <span>${data.routeSummary}</span>
+      </div>
+      <div class="route-action-buttons">
+        <button class="fit-route-btn" type="button">查看整日路线</button>
+        <a href="${dayRouteUrl("google", data)}" target="_blank" rel="noopener">Google 多点路线</a>
+        <a href="${dayRouteUrl("baidu", data)}" target="_blank" rel="noopener">百度路线搜索</a>
+        <a href="${dayRouteUrl("amap", data)}" target="_blank" rel="noopener">高德路线搜索</a>
+      </div>
+      <p>${data.routeNote || "站内线条是核心停靠点参考线；真实步行、公交、打车时间以当天地图 App 为准。"}</p>`;
+    const fitButton = dayRouteActions.querySelector(".fit-route-btn");
+    if (fitButton) fitButton.addEventListener("click", () => fitMainRoute(data));
+  }
+
+  function renderRoutes(data) {
+    routes.innerHTML = data.segments.map((segment, index) => `
+      <article class="route-segment" tabindex="0" data-focus="${segment.focus.join(",")}">
+        <div class="route-index">${index + 1}</div>
+        <div>
+          <h3>${segment.from} <span>-></span> ${segment.to}</h3>
+          <p><b>推荐交通：</b>${segment.mode}；<b>预计：</b>${segment.time}</p>
+          <p><b>顺路推荐：</b>${segment.food}</p>
+          <p class="meta"><b>避雷：</b>${segment.tip}</p>
+        </div>
+      </article>`).join("");
+    Array.from(routes.querySelectorAll(".route-segment")).forEach(card => {
+      const handler = () => focusPlaces(card.dataset.focus.split(","));
+      card.addEventListener("click", handler);
+      card.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          handler();
+        }
+      });
+    });
+  }
+
+  function renderDay(day) {
+    currentDay = day;
+    const data = dataByDay[day];
+    buttons.forEach(btn => btn.classList.toggle("active", btn.dataset.day === day));
+    list.innerHTML = data.places.map(place => `
+      <button class="place-chip" type="button" data-id="${place.id}">
+        <span class="place-dot ${typeClass[place.type] || "spot"}"></span>
+        <span>${place.name}</span>
+      </button>`).join("");
+    Array.from(list.querySelectorAll(".place-chip")).forEach(chip => {
+      chip.addEventListener("click", () => {
+        const place = data.places.find(item => item.id === chip.dataset.id);
+        if (!place) return;
+        renderDetail(place);
+        if (markers[place.id] && map) {
+          map.setView([place.lat, place.lng], 16);
+          markers[place.id].openPopup();
+        }
+      });
+    });
+    renderDetail(data.places[0]);
+    renderRoutes(data);
+    renderDayRouteActions(data);
+
+    if (!window.L) return;
+    if (!map) {
+      map = L.map(`${cityKey}-map`, {scrollWheelZoom:false}).setView(data.center, data.zoom);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap"
+      }).addTo(map);
+    }
+    if (layer) layer.remove();
+    layer = L.layerGroup().addTo(map);
+    markers = {};
+    data.places.forEach(place => {
+      const marker = L.marker([place.lat, place.lng], {icon: iconFor(place)})
+        .bindPopup(`<b>${place.name}</b><br>${place.address}`)
+        .on("click", () => renderDetail(place));
+      marker.addTo(layer);
+      markers[place.id] = marker;
+    });
+    drawMainRoute(data);
+    fitMainRoute(data);
+    setTimeout(() => map.invalidateSize(), 120);
+  }
+
+  buttons.forEach(btn => btn.addEventListener("click", () => renderDay(btn.dataset.day)));
+  renderDay(currentDay);
+})();
+</script>
 <section class="section">
   <div class="section-head"><h2>Day 1：渝中核心 City Walk</h2></div>
   <div class="timeline"><article class="slot">

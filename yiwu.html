@@ -46,6 +46,226 @@
   <div><h3>兴中小区/长春街</h3><p>手串、珠子、饰品配件更适合单买，慢慢淘比在批发档口被拒绝舒服。</p><p class="meta"><b>交通:</b> 住稠城/商贸城附近打车</p><p class="meta"><b>费用/提醒:</b> 单买友好</p></div>
 </article></div>
 </section>
+<section class="section map-section" id="yw-map-section">
+  <div class="section-head">
+    <h2>义乌购物地图路线</h2>
+    <p class="section-intro">重点不是打卡，而是知道每个区卖什么、怎么顺路逛、什么时候该换到零售市场。</p>
+  </div>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <div class="map-tools" role="group" aria-label="切换义乌购物地图路线日期">
+    <button class="map-day-btn active" type="button" data-day="day1">Day 1 商贸城主线</button><button class="map-day-btn " type="button" data-day="day2">Day 2 零售补逛</button>
+  </div>
+  <div class="day-route-actions" id="yw-day-route-actions"></div>
+  <div class="map-layout">
+    <div class="map-card">
+      <div id="yw-map" class="travel-map" aria-label="义乌购物点位地图"></div>
+      <p class="map-fallback">如果地图瓦片加载失败，下面的点位和路线文字仍然可用；实时路线请点击外部地图导航。</p>
+    </div>
+    <aside class="place-panel" aria-live="polite">
+      <div class="place-detail" id="yw-place-detail"></div>
+      <div class="place-list" id="yw-place-list"></div>
+    </aside>
+  </div>
+  <div class="route-panel" id="yw-route-panel"></div>
+</section>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const TRAVEL_MAP_DATA_YW = {"day1": {"label": "Day 1 商贸城主线", "city": "义乌", "center": [29.3238, 120.1025], "zoom": 13, "routeSummary": "义乌站 -> 国际商贸城五区 -> 四区 -> 一区 -> 篁园服装市场 -> 鸡鸣阁/宾王夜市", "mainRoute": ["yiwu-station", "district5", "district4", "district1", "huangyuan", "jimingge", "binwang-night"], "navRoute": ["yiwu-station", "district5", "district4", "district1", "huangyuan", "binwang-night"], "places": [{"id": "yiwu-station", "name": "义乌站", "type": "交通", "lat": 29.3794, "lng": 120.0334, "address": "浙江省金华市义乌市义乌站", "stay": "到达/返程", "note": "南广场 11 号站台可坐市场专线，第一次来也可直接打车到目标区。", "recommend": "先定第一个区，别到了商贸城再临时纠结。"}, {"id": "district5", "name": "国际商贸城五区", "type": "购物", "lat": 29.3402, "lng": 120.116, "address": "浙江省义乌市国际商贸城五区", "stay": "45-90 分钟", "note": "进口、家纺、宠物、汽车用品。有明确需求再去，普通游客快速扫过。", "recommend": "宠物用品、床品、进口商品、汽车用品；多数不零售。"}, {"id": "district4", "name": "国际商贸城四区", "type": "购物", "lat": 29.3345, "lng": 120.1117, "address": "浙江省义乌市国际商贸城四区", "stay": "90-150 分钟", "note": "袜子、帽子、睡衣、日百，游客友好度相对高。", "recommend": "1F 小袜岛、2F 帽子、日用百货；先问零售和起批。"}, {"id": "district1", "name": "国际商贸城一区", "type": "购物", "lat": 29.327, "lng": 120.098, "address": "浙江省义乌市国际商贸城一区", "stay": "2-3 小时", "note": "饰品、发饰、玩具、仿真花。建议从 4F 往下逛。", "recommend": "饰品、发饰、玩具、玩偶、仿真花、喜庆用品。"}, {"id": "huangyuan", "name": "篁园服装市场", "type": "购物", "lat": 29.3034, "lng": 120.0795, "address": "浙江省义乌市篁园服装市场", "stay": "60-120 分钟", "note": "晚上想买衣服可来，和商贸城批发逻辑不同。", "recommend": "衣服、穿搭类，适合零售补充。"}, {"id": "jimingge", "name": "鸡鸣阁", "type": "夜景", "lat": 29.3023, "lng": 120.086, "address": "浙江省义乌市鸡鸣阁", "stay": "30-60 分钟", "note": "晚间拍照点，适合购物后换脑子。", "recommend": "拍夜景，不是购物点。"}, {"id": "binwang-night", "name": "宾王夜市", "type": "购物", "lat": 29.3154, "lng": 120.085, "address": "浙江省义乌市宾王夜市", "stay": "60-120 分钟", "note": "小吃、衣服、小商品都有，适合体验和少量零售。", "recommend": "夜市小商品、小吃；不要当作严肃采购比价地。"}], "segments": [{"from": "义乌站", "to": "商贸城五区", "mode": "市场专线/BRT/出租车", "time": "25-45 分钟", "food": "到商贸城先买水和轻食。", "tip": "赶时间直接打车到第一个目标区。", "focus": ["yiwu-station", "district5"]}, {"from": "五区", "to": "四区", "mode": "内部步行/短打车", "time": "10-20 分钟", "food": "午餐别离开太远，下午继续逛。", "tip": "五区需求不明确就快速扫过。", "focus": ["district5", "district4"]}, {"from": "四区", "to": "一区", "mode": "商贸城内部转场", "time": "15-30 分钟", "food": "下午补咖啡或简餐，别拎太多继续走。", "tip": "一区 17:00 前陆续收摊，别太晚到。", "focus": ["district4", "district1"]}, {"from": "一区", "to": "篁园/夜市", "mode": "打车", "time": "20-35 分钟", "food": "晚餐可放篁园/宾王夜市附近。", "tip": "批发市场和夜市价格逻辑不同，别用夜市价反推批发。", "focus": ["district1", "huangyuan", "binwang-night"]}, {"from": "夜市", "to": "酒店", "mode": "打车/步行看住宿位置", "time": "10-30 分钟", "food": "夜市小吃浅尝，第二天还要逛。", "tip": "贵重物品、采购样品和小票分开放。", "focus": ["binwang-night", "jimingge"]}]}, "day2": {"label": "Day 2 零售补逛", "city": "义乌", "center": [29.318, 120.091], "zoom": 13, "routeSummary": "酒店 -> 商贸城补逛 -> 兴中小区/长春街 -> 义乌之心/新光汇 -> 返程", "mainRoute": ["hotel-yiwu", "district1-repeat", "xingzhong", "changchun", "yiwu-heart", "yiwu-station-2"], "navRoute": ["hotel-yiwu", "district1-repeat", "xingzhong", "changchun", "yiwu-heart", "yiwu-station-2"], "places": [{"id": "hotel-yiwu", "name": "稠城/商贸城住宿区", "type": "区域", "lat": 29.32, "lng": 120.093, "address": "浙江省义乌市稠城街道/国际商贸城附近", "stay": "住宿/整理", "note": "第二天先整理昨天拍的摊位号和采购清单。", "recommend": "把要复购的摊位号、价格、起订量写清楚。"}, {"id": "district1-repeat", "name": "国际商贸城补逛", "type": "购物", "lat": 29.327, "lng": 120.098, "address": "浙江省义乌市国际商贸城一区/四区", "stay": "1.5-3 小时", "note": "只补昨天没买完的品类，不重新随机扫楼。", "recommend": "饰品、袜子、帽子、玩具补货；问清混批和快递。"}, {"id": "xingzhong", "name": "兴中小区", "type": "购物", "lat": 29.3132, "lng": 120.0922, "address": "浙江省义乌市兴中小区", "stay": "90-150 分钟", "note": "手串、珠子、饰品配件更适合单买，慢慢淘。", "recommend": "手串、珠子、饰品配件、DIY 小件。"}, {"id": "changchun", "name": "长春街", "type": "购物", "lat": 29.314, "lng": 120.091, "address": "浙江省义乌市长春街", "stay": "45-90 分钟", "note": "和兴中小区可连逛，适合零售补充。", "recommend": "饰品、小商品、配件，价格多比较。"}, {"id": "yiwu-heart", "name": "义乌之心/新光汇", "type": "餐厅", "lat": 29.3048, "lng": 120.074, "address": "浙江省义乌市义乌之心/新光汇商圈", "stay": "60-120 分钟", "note": "返程前吃饭、休息、整理战利品。", "recommend": "本地菜、异国菜、咖啡；义乌外贸氛围适合试异国餐。"}, {"id": "yiwu-station-2", "name": "义乌站返程", "type": "交通", "lat": 29.3794, "lng": 120.0334, "address": "浙江省金华市义乌市义乌站", "stay": "返程", "note": "购物多就提前叫车，别卡点拖大袋子进站。", "recommend": "采购大件优先物流/快递，不手提硬扛。"}], "segments": [{"from": "酒店", "to": "商贸城补逛", "mode": "打车/BRT", "time": "10-30 分钟", "food": "早餐后再逛，带水。", "tip": "只按清单补逛，不重新迷路。", "focus": ["hotel-yiwu", "district1-repeat"]}, {"from": "商贸城", "to": "兴中小区/长春街", "mode": "打车", "time": "15-25 分钟", "food": "附近小吃和简餐即可。", "tip": "零售友好但也要问清价格和材质。", "focus": ["district1-repeat", "xingzhong", "changchun"]}, {"from": "兴中小区", "to": "商圈晚餐", "mode": "打车/公交", "time": "15-30 分钟", "food": "本地菜或异国菜收尾。", "tip": "返程前整理小票、快递单和样品。", "focus": ["xingzhong", "yiwu-heart"]}, {"from": "商圈", "to": "义乌站", "mode": "网约车", "time": "30-45 分钟", "food": "车站前别再购物加袋子。", "tip": "大件提前快递，返程留足进站安检时间。", "focus": ["yiwu-heart", "yiwu-station-2"]}]}};
+(function initTravelMap() {
+  const cityKey = "yw";
+  const recommendLabel = "推荐买什么";
+  const routeColor = "#16745f";
+  const dataByDay = TRAVEL_MAP_DATA_YW;
+  const detail = document.getElementById(`${cityKey}-place-detail`);
+  const list = document.getElementById(`${cityKey}-place-list`);
+  const routes = document.getElementById(`${cityKey}-route-panel`);
+  const dayRouteActions = document.getElementById(`${cityKey}-day-route-actions`);
+  const section = document.getElementById(`${cityKey}-map-section`);
+  const buttons = section ? Array.from(section.querySelectorAll(".map-day-btn")) : [];
+  if (!detail || !list || !routes || !dayRouteActions || !section) return;
+
+  let currentDay = Object.keys(dataByDay)[0];
+  let map = null;
+  let layer = null;
+  let routeLine = null;
+  let routeHalo = null;
+  let markers = {};
+
+  const typeClass = {"景点":"spot","餐厅":"food","小吃甜品":"sweet","交通":"transport","购物":"shopping","园区":"park","夜景":"night","区域":"area"};
+  const typeLabel = {"景点":"景","餐厅":"餐","小吃甜品":"甜","交通":"行","购物":"购","园区":"园","夜景":"夜","区域":"区"};
+
+  function mapSearchUrl(provider, place) {
+    const query = encodeURIComponent(`${place.name} ${place.address}`);
+    if (provider === "google") return `https://www.google.com/maps/search/?api=1&query=${query}`;
+    if (provider === "baidu") return `https://map.baidu.com/search/${query}`;
+    return `https://uri.amap.com/search?keyword=${query}`;
+  }
+
+  function dayRouteUrl(provider, data) {
+    const routeIds = data.navRoute || data.mainRoute;
+    const points = routeIds.map(id => data.places.find(place => place.id === id)).filter(Boolean);
+    const routeText = data.routeSummary || points.map(place => place.name).join(" -> ");
+    if (!points.length) return "#";
+    if (provider === "google") {
+      const origin = encodeURIComponent(`${points[0].name} ${points[0].address}`);
+      const destination = encodeURIComponent(`${points[points.length - 1].name} ${points[points.length - 1].address}`);
+      const waypoints = points.slice(1, -1).map(place => `${place.name} ${place.address}`).join("|");
+      return `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&waypoints=${encodeURIComponent(waypoints)}&travelmode=walking`;
+    }
+    const query = encodeURIComponent(`${data.city || ""} ${routeText}`);
+    if (provider === "baidu") return `https://map.baidu.com/search/${query}`;
+    return `https://uri.amap.com/search?keyword=${query}`;
+  }
+
+  function renderDetail(place) {
+    detail.innerHTML = `
+      <span class="place-type ${typeClass[place.type] || "spot"}">${place.type}</span>
+      <h3>${place.name}</h3>
+      <p>${place.note}</p>
+      <dl>
+        <dt>地址</dt><dd>${place.address}</dd>
+        <dt>建议停留</dt><dd>${place.stay}</dd>
+        ${place.recommend ? `<dt>${recommendLabel}</dt><dd>${place.recommend}</dd>` : ""}
+      </dl>
+      <div class="nav-links">
+        <a href="${mapSearchUrl("google", place)}" target="_blank" rel="noopener">Google</a>
+        <a href="${mapSearchUrl("baidu", place)}" target="_blank" rel="noopener">百度</a>
+        <a href="${mapSearchUrl("amap", place)}" target="_blank" rel="noopener">高德</a>
+      </div>`;
+  }
+
+  function iconFor(place) {
+    return L.divIcon({
+      className: `travel-marker ${typeClass[place.type] || "spot"}`,
+      html: `<span>${typeLabel[place.type] || "点"}</span>`,
+      iconSize: [30, 30],
+      iconAnchor: [15, 15]
+    });
+  }
+
+  function focusPlaces(ids) {
+    if (!map || !ids || !ids.length) return;
+    const points = ids.map(id => markers[id]).filter(Boolean).map(marker => marker.getLatLng());
+    if (points.length === 1) map.setView(points[0], 16);
+    if (points.length > 1) map.fitBounds(L.latLngBounds(points), {padding: [42, 42]});
+  }
+
+  function routePoints(data) {
+    return (data.mainRoute || [])
+      .map(id => data.places.find(place => place.id === id))
+      .filter(Boolean)
+      .map(place => [place.lat, place.lng]);
+  }
+
+  function fitMainRoute(data) {
+    if (!map) return;
+    const points = routePoints(data);
+    if (points.length > 1) map.fitBounds(L.latLngBounds(points), {padding: [34, 34]});
+  }
+
+  function drawMainRoute(data) {
+    if (!map) return;
+    if (routeLine) routeLine.remove();
+    if (routeHalo) routeHalo.remove();
+    const points = routePoints(data);
+    if (points.length < 2) return;
+    routeHalo = L.polyline(points, {color:"#ffffff", weight:9, opacity:.9, lineJoin:"round"}).addTo(map);
+    routeLine = L.polyline(points, {color:routeColor, weight:5, opacity:.92, lineJoin:"round"}).addTo(map);
+    routeLine.bringToBack();
+    routeHalo.bringToBack();
+  }
+
+  function renderDayRouteActions(data) {
+    dayRouteActions.innerHTML = `
+      <div class="route-summary">
+        <strong>整日主路线</strong>
+        <span>${data.routeSummary}</span>
+      </div>
+      <div class="route-action-buttons">
+        <button class="fit-route-btn" type="button">查看整日路线</button>
+        <a href="${dayRouteUrl("google", data)}" target="_blank" rel="noopener">Google 多点路线</a>
+        <a href="${dayRouteUrl("baidu", data)}" target="_blank" rel="noopener">百度路线搜索</a>
+        <a href="${dayRouteUrl("amap", data)}" target="_blank" rel="noopener">高德路线搜索</a>
+      </div>
+      <p>${data.routeNote || "站内线条是核心停靠点参考线；真实步行、公交、打车时间以当天地图 App 为准。"}</p>`;
+    const fitButton = dayRouteActions.querySelector(".fit-route-btn");
+    if (fitButton) fitButton.addEventListener("click", () => fitMainRoute(data));
+  }
+
+  function renderRoutes(data) {
+    routes.innerHTML = data.segments.map((segment, index) => `
+      <article class="route-segment" tabindex="0" data-focus="${segment.focus.join(",")}">
+        <div class="route-index">${index + 1}</div>
+        <div>
+          <h3>${segment.from} <span>-></span> ${segment.to}</h3>
+          <p><b>推荐交通：</b>${segment.mode}；<b>预计：</b>${segment.time}</p>
+          <p><b>顺路推荐：</b>${segment.food}</p>
+          <p class="meta"><b>避雷：</b>${segment.tip}</p>
+        </div>
+      </article>`).join("");
+    Array.from(routes.querySelectorAll(".route-segment")).forEach(card => {
+      const handler = () => focusPlaces(card.dataset.focus.split(","));
+      card.addEventListener("click", handler);
+      card.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          handler();
+        }
+      });
+    });
+  }
+
+  function renderDay(day) {
+    currentDay = day;
+    const data = dataByDay[day];
+    buttons.forEach(btn => btn.classList.toggle("active", btn.dataset.day === day));
+    list.innerHTML = data.places.map(place => `
+      <button class="place-chip" type="button" data-id="${place.id}">
+        <span class="place-dot ${typeClass[place.type] || "spot"}"></span>
+        <span>${place.name}</span>
+      </button>`).join("");
+    Array.from(list.querySelectorAll(".place-chip")).forEach(chip => {
+      chip.addEventListener("click", () => {
+        const place = data.places.find(item => item.id === chip.dataset.id);
+        if (!place) return;
+        renderDetail(place);
+        if (markers[place.id] && map) {
+          map.setView([place.lat, place.lng], 16);
+          markers[place.id].openPopup();
+        }
+      });
+    });
+    renderDetail(data.places[0]);
+    renderRoutes(data);
+    renderDayRouteActions(data);
+
+    if (!window.L) return;
+    if (!map) {
+      map = L.map(`${cityKey}-map`, {scrollWheelZoom:false}).setView(data.center, data.zoom);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap"
+      }).addTo(map);
+    }
+    if (layer) layer.remove();
+    layer = L.layerGroup().addTo(map);
+    markers = {};
+    data.places.forEach(place => {
+      const marker = L.marker([place.lat, place.lng], {icon: iconFor(place)})
+        .bindPopup(`<b>${place.name}</b><br>${place.address}`)
+        .on("click", () => renderDetail(place));
+      marker.addTo(layer);
+      markers[place.id] = marker;
+    });
+    drawMainRoute(data);
+    fitMainRoute(data);
+    setTimeout(() => map.invalidateSize(), 120);
+  }
+
+  buttons.forEach(btn => btn.addEventListener("click", () => renderDay(btn.dataset.day)));
+  renderDay(currentDay);
+})();
+</script>
 <section class="section">
   <div class="section-head"><h2>国际商贸城：每个区卖什么</h2></div>
   <div class="table-wrap"><table><thead><tr><th>区</th><th>主要品类</th><th>适合谁</th></tr></thead><tbody><tr><td>一区</td><td>饰品、发饰、玩具、玩偶、仿真花、工艺品、喜庆用品。</td><td>普通游客和年轻人最容易逛出收获。</td></tr>

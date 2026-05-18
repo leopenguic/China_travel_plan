@@ -30,6 +30,226 @@
 <tr><td>Day 2</td><td>明清宫苑 -&gt; 广州街香港街 -&gt; 万盛街/返程</td><td>宫廷剧/港风民国街景/拍照党</td></tr>
 <tr><td>追星可选</td><td>早出妆/晚收工 + 景区压缩游</td><td>目标剧组明确、愿意牺牲部分景点的人</td></tr></tbody></table></div>
 </section>
+<section class="section map-section" id="hd-map-section">
+  <div class="section-head">
+    <h2>横店地图路线</h2>
+    <p class="section-intro">把两天园区安排画成路线图：看每个园区位置、转场方式、什么时候拍照更舒服，以及哪些点只是可选。</p>
+  </div>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <div class="map-tools" role="group" aria-label="切换横店地图路线日期">
+    <button class="map-day-btn active" type="button" data-day="day1">Day 1 秦王宫+梦幻谷</button><button class="map-day-btn " type="button" data-day="day2">Day 2 明清宫苑+广州街</button>
+  </div>
+  <div class="day-route-actions" id="hd-day-route-actions"></div>
+  <div class="map-layout">
+    <div class="map-card">
+      <div id="hd-map" class="travel-map" aria-label="横店旅行点位地图"></div>
+      <p class="map-fallback">如果地图瓦片加载失败，下面的点位和路线文字仍然可用；实时路线请点击外部地图导航。</p>
+    </div>
+    <aside class="place-panel" aria-live="polite">
+      <div class="place-detail" id="hd-place-detail"></div>
+      <div class="place-list" id="hd-place-list"></div>
+    </aside>
+  </div>
+  <div class="route-panel" id="hd-route-panel"></div>
+</section>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const TRAVEL_MAP_DATA_HD = {"day1": {"label": "Day 1 秦王宫+梦幻谷", "city": "横店", "center": [29.1525, 120.3194], "zoom": 13, "routeSummary": "酒店/游客中心 -> 秦王宫 -> 清明上河图 -> 梦幻谷 -> 万盛街夜宵", "mainRoute": ["hotel", "qin-palace", "qingming", "dream-valley", "wansheng-street"], "navRoute": ["hotel", "qin-palace", "qingming", "dream-valley", "wansheng-street"], "places": [{"id": "hotel", "name": "横店镇中心/酒店区", "type": "区域", "lat": 29.154, "lng": 120.314, "address": "浙江省金华市东阳市横店镇中心/万盛街周边", "stay": "住宿/集合", "note": "两天短途优先住镇中心或官方酒店，打车转场更省体力。", "recommend": "早饭简单吃，带水和充电宝。"}, {"id": "qin-palace", "name": "秦王宫", "type": "园区", "lat": 29.1467, "lng": 120.3313, "address": "浙江省东阳市横店镇秦王宫景区", "stay": "2.5-3.5 小时", "note": "早上 8:00-10:00 更适合拍空景；中宫门、王宫广场、四海归一殿是核心。", "recommend": "低机位拍广场，城墙俯拍，演出优先选室内大项目。"}, {"id": "qingming", "name": "清明上河图", "type": "园区", "lat": 29.1397, "lng": 120.3228, "address": "浙江省东阳市横店镇清明上河图景区", "stay": "2.5-3 小时", "note": "虹桥、水街、市井街区和码头适合宋制写真。", "recommend": "15:30 后光线柔和；桥上别停太久挡人。"}, {"id": "dream-valley", "name": "梦幻谷", "type": "园区", "lat": 29.1372, "lng": 120.3262, "address": "浙江省东阳市横店镇梦幻谷景区", "stay": "3-4 小时", "note": "16:00 后入园性价比高，重点留给夜场和大演艺。", "recommend": "先玩项目，再卡《暴雨山洪》《梦幻太极》类演出时间。"}, {"id": "wansheng-street", "name": "万盛街/镇中心夜宵", "type": "餐厅", "lat": 29.1536, "lng": 120.3145, "address": "浙江省东阳市横店镇万盛街", "stay": "60-90 分钟", "note": "晚上回镇上吃更灵活，别跨很远追同款店。", "recommend": "东阳沃面、金华酥饼、烤肉、港式饮品。"}], "segments": [{"from": "酒店", "to": "秦王宫", "mode": "网约车/景区接驳", "time": "10-20 分钟", "food": "早餐别太撑，景区内走路多。", "tip": "越早越容易拍空广场。", "focus": ["hotel", "qin-palace"]}, {"from": "秦王宫", "to": "清明上河图", "mode": "短打车或接驳", "time": "10-20 分钟", "food": "午餐选简餐，下午继续拍照。", "tip": "别为了便宜公交牺牲太多时间。", "focus": ["qin-palace", "qingming"]}, {"from": "清明上河图", "to": "梦幻谷", "mode": "短打车/步行视入口而定", "time": "10-20 分钟", "food": "入园前补水，夜场排队时吃小食。", "tip": "先看当天演出时间表再排队。", "focus": ["qingming", "dream-valley"]}, {"from": "梦幻谷", "to": "万盛街", "mode": "网约车", "time": "15-25 分钟", "food": "夜宵选镇中心，烤肉/沃面/小吃都方便。", "tip": "散场叫车可能慢，提前 10 分钟看车。", "focus": ["dream-valley", "wansheng-street"]}]}, "day2": {"label": "Day 2 明清宫苑+广州街", "city": "横店", "center": [29.1665, 120.307], "zoom": 13, "routeSummary": "明清宫苑 -> 镇中心午餐 -> 广州街香港街 -> 梦外滩/圆明新园可选 -> 万盛街/返程", "mainRoute": ["mingqing", "lunch-town", "gz-hk-street", "dream-bund", "yuanming", "wansheng-street-2"], "navRoute": ["mingqing", "lunch-town", "gz-hk-street", "wansheng-street-2"], "places": [{"id": "mingqing", "name": "明清宫苑", "type": "园区", "lat": 29.1716, "lng": 120.3022, "address": "浙江省东阳市横店镇明清宫苑景区", "stay": "3-4 小时", "note": "一开园或 15:30 后更适合拍红墙、午门和中轴线。", "recommend": "午门、中轴线、后宫区域、御花园、红墙拐角。"}, {"id": "lunch-town", "name": "横店镇中心午餐", "type": "餐厅", "lat": 29.1542, "lng": 120.315, "address": "浙江省东阳市横店镇中心", "stay": "60-80 分钟", "note": "上午园区出来先吃饭休息，再去下午园区。", "recommend": "东阳沃面、土菜、金华酥饼；同款店排队久就换。"}, {"id": "gz-hk-street", "name": "广州街香港街", "type": "园区", "lat": 29.1802, "lng": 120.2991, "address": "浙江省东阳市横店镇广州街香港街景区", "stay": "2.5-4 小时", "note": "15:30-17:30 光线柔和，18:30 后灯牌亮起更港风。", "recommend": "钟楼广场、骑楼街、港式招牌、码头/电车感街道。"}, {"id": "dream-bund", "name": "梦外滩可选", "type": "园区", "lat": 29.1571, "lng": 120.2934, "address": "浙江省东阳市横店镇梦外滩景区", "stay": "2-3 小时", "note": "喜欢老上海风可替换广州街香港街，不建议两天硬塞太多园区。", "recommend": "洋楼门廊、复古车、霓虹灯，傍晚到夜晚更出片。"}, {"id": "yuanming", "name": "圆明新园可选", "type": "园区", "lat": 29.1358, "lng": 120.292, "address": "浙江省东阳市横店镇圆明新园", "stay": "3-5 小时", "note": "面积大、优先级低于四个经典区，适合第三天加。", "recommend": "湖面、长廊、欧式建筑、水边倒影。"}, {"id": "wansheng-street-2", "name": "万盛街/返程", "type": "交通", "lat": 29.1536, "lng": 120.3145, "address": "浙江省东阳市横店镇万盛街", "stay": "取行李/晚餐", "note": "返程日留足到横店站时间，不要最后一刻还在园区。", "recommend": "补买小吃，回酒店取行李。"}], "segments": [{"from": "明清宫苑", "to": "镇中心午餐", "mode": "网约车", "time": "15-25 分钟", "food": "东阳沃面、土菜、金华酥饼。", "tip": "同款餐厅排队超过 30 分钟就换近处。", "focus": ["mingqing", "lunch-town"]}, {"from": "镇中心", "to": "广州街香港街", "mode": "网约车/接驳", "time": "15-25 分钟", "food": "下午带水，园区内小食只作补给。", "tip": "广州街香港街下午到傍晚更好拍。", "focus": ["lunch-town", "gz-hk-street"]}, {"from": "广州街", "to": "梦外滩/圆明新园可选", "mode": "按体力打车二选一", "time": "20-40 分钟", "food": "别为了多打卡牺牲返程时间。", "tip": "梦外滩和圆明新园是可选，不强制进主线。", "focus": ["gz-hk-street", "dream-bund", "yuanming"]}, {"from": "广州街/可选园区", "to": "万盛街返程", "mode": "网约车", "time": "15-30 分钟", "food": "晚餐选镇中心，返程前别吃太慢。", "tip": "返程日优先时间安全，不要卡点。", "focus": ["gz-hk-street", "wansheng-street-2"]}]}};
+(function initTravelMap() {
+  const cityKey = "hd";
+  const recommendLabel = "推荐拍/看/吃";
+  const routeColor = "#b03d33";
+  const dataByDay = TRAVEL_MAP_DATA_HD;
+  const detail = document.getElementById(`${cityKey}-place-detail`);
+  const list = document.getElementById(`${cityKey}-place-list`);
+  const routes = document.getElementById(`${cityKey}-route-panel`);
+  const dayRouteActions = document.getElementById(`${cityKey}-day-route-actions`);
+  const section = document.getElementById(`${cityKey}-map-section`);
+  const buttons = section ? Array.from(section.querySelectorAll(".map-day-btn")) : [];
+  if (!detail || !list || !routes || !dayRouteActions || !section) return;
+
+  let currentDay = Object.keys(dataByDay)[0];
+  let map = null;
+  let layer = null;
+  let routeLine = null;
+  let routeHalo = null;
+  let markers = {};
+
+  const typeClass = {"景点":"spot","餐厅":"food","小吃甜品":"sweet","交通":"transport","购物":"shopping","园区":"park","夜景":"night","区域":"area"};
+  const typeLabel = {"景点":"景","餐厅":"餐","小吃甜品":"甜","交通":"行","购物":"购","园区":"园","夜景":"夜","区域":"区"};
+
+  function mapSearchUrl(provider, place) {
+    const query = encodeURIComponent(`${place.name} ${place.address}`);
+    if (provider === "google") return `https://www.google.com/maps/search/?api=1&query=${query}`;
+    if (provider === "baidu") return `https://map.baidu.com/search/${query}`;
+    return `https://uri.amap.com/search?keyword=${query}`;
+  }
+
+  function dayRouteUrl(provider, data) {
+    const routeIds = data.navRoute || data.mainRoute;
+    const points = routeIds.map(id => data.places.find(place => place.id === id)).filter(Boolean);
+    const routeText = data.routeSummary || points.map(place => place.name).join(" -> ");
+    if (!points.length) return "#";
+    if (provider === "google") {
+      const origin = encodeURIComponent(`${points[0].name} ${points[0].address}`);
+      const destination = encodeURIComponent(`${points[points.length - 1].name} ${points[points.length - 1].address}`);
+      const waypoints = points.slice(1, -1).map(place => `${place.name} ${place.address}`).join("|");
+      return `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&waypoints=${encodeURIComponent(waypoints)}&travelmode=walking`;
+    }
+    const query = encodeURIComponent(`${data.city || ""} ${routeText}`);
+    if (provider === "baidu") return `https://map.baidu.com/search/${query}`;
+    return `https://uri.amap.com/search?keyword=${query}`;
+  }
+
+  function renderDetail(place) {
+    detail.innerHTML = `
+      <span class="place-type ${typeClass[place.type] || "spot"}">${place.type}</span>
+      <h3>${place.name}</h3>
+      <p>${place.note}</p>
+      <dl>
+        <dt>地址</dt><dd>${place.address}</dd>
+        <dt>建议停留</dt><dd>${place.stay}</dd>
+        ${place.recommend ? `<dt>${recommendLabel}</dt><dd>${place.recommend}</dd>` : ""}
+      </dl>
+      <div class="nav-links">
+        <a href="${mapSearchUrl("google", place)}" target="_blank" rel="noopener">Google</a>
+        <a href="${mapSearchUrl("baidu", place)}" target="_blank" rel="noopener">百度</a>
+        <a href="${mapSearchUrl("amap", place)}" target="_blank" rel="noopener">高德</a>
+      </div>`;
+  }
+
+  function iconFor(place) {
+    return L.divIcon({
+      className: `travel-marker ${typeClass[place.type] || "spot"}`,
+      html: `<span>${typeLabel[place.type] || "点"}</span>`,
+      iconSize: [30, 30],
+      iconAnchor: [15, 15]
+    });
+  }
+
+  function focusPlaces(ids) {
+    if (!map || !ids || !ids.length) return;
+    const points = ids.map(id => markers[id]).filter(Boolean).map(marker => marker.getLatLng());
+    if (points.length === 1) map.setView(points[0], 16);
+    if (points.length > 1) map.fitBounds(L.latLngBounds(points), {padding: [42, 42]});
+  }
+
+  function routePoints(data) {
+    return (data.mainRoute || [])
+      .map(id => data.places.find(place => place.id === id))
+      .filter(Boolean)
+      .map(place => [place.lat, place.lng]);
+  }
+
+  function fitMainRoute(data) {
+    if (!map) return;
+    const points = routePoints(data);
+    if (points.length > 1) map.fitBounds(L.latLngBounds(points), {padding: [34, 34]});
+  }
+
+  function drawMainRoute(data) {
+    if (!map) return;
+    if (routeLine) routeLine.remove();
+    if (routeHalo) routeHalo.remove();
+    const points = routePoints(data);
+    if (points.length < 2) return;
+    routeHalo = L.polyline(points, {color:"#ffffff", weight:9, opacity:.9, lineJoin:"round"}).addTo(map);
+    routeLine = L.polyline(points, {color:routeColor, weight:5, opacity:.92, lineJoin:"round"}).addTo(map);
+    routeLine.bringToBack();
+    routeHalo.bringToBack();
+  }
+
+  function renderDayRouteActions(data) {
+    dayRouteActions.innerHTML = `
+      <div class="route-summary">
+        <strong>整日主路线</strong>
+        <span>${data.routeSummary}</span>
+      </div>
+      <div class="route-action-buttons">
+        <button class="fit-route-btn" type="button">查看整日路线</button>
+        <a href="${dayRouteUrl("google", data)}" target="_blank" rel="noopener">Google 多点路线</a>
+        <a href="${dayRouteUrl("baidu", data)}" target="_blank" rel="noopener">百度路线搜索</a>
+        <a href="${dayRouteUrl("amap", data)}" target="_blank" rel="noopener">高德路线搜索</a>
+      </div>
+      <p>${data.routeNote || "站内线条是核心停靠点参考线；真实步行、公交、打车时间以当天地图 App 为准。"}</p>`;
+    const fitButton = dayRouteActions.querySelector(".fit-route-btn");
+    if (fitButton) fitButton.addEventListener("click", () => fitMainRoute(data));
+  }
+
+  function renderRoutes(data) {
+    routes.innerHTML = data.segments.map((segment, index) => `
+      <article class="route-segment" tabindex="0" data-focus="${segment.focus.join(",")}">
+        <div class="route-index">${index + 1}</div>
+        <div>
+          <h3>${segment.from} <span>-></span> ${segment.to}</h3>
+          <p><b>推荐交通：</b>${segment.mode}；<b>预计：</b>${segment.time}</p>
+          <p><b>顺路推荐：</b>${segment.food}</p>
+          <p class="meta"><b>避雷：</b>${segment.tip}</p>
+        </div>
+      </article>`).join("");
+    Array.from(routes.querySelectorAll(".route-segment")).forEach(card => {
+      const handler = () => focusPlaces(card.dataset.focus.split(","));
+      card.addEventListener("click", handler);
+      card.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          handler();
+        }
+      });
+    });
+  }
+
+  function renderDay(day) {
+    currentDay = day;
+    const data = dataByDay[day];
+    buttons.forEach(btn => btn.classList.toggle("active", btn.dataset.day === day));
+    list.innerHTML = data.places.map(place => `
+      <button class="place-chip" type="button" data-id="${place.id}">
+        <span class="place-dot ${typeClass[place.type] || "spot"}"></span>
+        <span>${place.name}</span>
+      </button>`).join("");
+    Array.from(list.querySelectorAll(".place-chip")).forEach(chip => {
+      chip.addEventListener("click", () => {
+        const place = data.places.find(item => item.id === chip.dataset.id);
+        if (!place) return;
+        renderDetail(place);
+        if (markers[place.id] && map) {
+          map.setView([place.lat, place.lng], 16);
+          markers[place.id].openPopup();
+        }
+      });
+    });
+    renderDetail(data.places[0]);
+    renderRoutes(data);
+    renderDayRouteActions(data);
+
+    if (!window.L) return;
+    if (!map) {
+      map = L.map(`${cityKey}-map`, {scrollWheelZoom:false}).setView(data.center, data.zoom);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap"
+      }).addTo(map);
+    }
+    if (layer) layer.remove();
+    layer = L.layerGroup().addTo(map);
+    markers = {};
+    data.places.forEach(place => {
+      const marker = L.marker([place.lat, place.lng], {icon: iconFor(place)})
+        .bindPopup(`<b>${place.name}</b><br>${place.address}`)
+        .on("click", () => renderDetail(place));
+      marker.addTo(layer);
+      markers[place.id] = marker;
+    });
+    drawMainRoute(data);
+    fitMainRoute(data);
+    setTimeout(() => map.invalidateSize(), 120);
+  }
+
+  buttons.forEach(btn => btn.addEventListener("click", () => renderDay(btn.dataset.day)));
+  renderDay(currentDay);
+})();
+</script>
 <section class="section">
   <div class="section-head"><h2>Day 1：秦王宫 + 清明上河图 + 梦幻谷</h2></div>
   <div class="timeline"><article class="slot">
