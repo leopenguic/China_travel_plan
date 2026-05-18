@@ -28,6 +28,217 @@
   <div class="section-head"><h2>核心安排</h2></div>
   <div class="card-grid"><article class="card"><h3>Day 1</h3><p>西九龙文化区 -&gt; 尖沙咀维港 -&gt; 油麻地老街 -&gt; 旺角扫街吃小吃。</p></article><article class="card"><h3>Day 2</h3><p>中环历史街区 -&gt; 大馆/半山扶梯 -&gt; 叮叮车港岛线 -&gt; 山顶或天星小轮夜景。</p></article><article class="card"><h3>交通策略</h3><p>开通八达通，准备 HK$300 左右余额；频繁搭 MTR 可考虑游客全日通 HK$75/天。</p></article></div>
 </section>
+<section class="section map-section" id="hongkong-map-section">
+  <div class="section-head">
+    <h2>香港地图路线测试版</h2>
+    <p class="section-intro">先用香港做测试：地图标记景点、餐厅、小吃甜品和交通点；路线段给出建议交通，实时导航交给地图 App。</p>
+  </div>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <div class="map-tools" role="group" aria-label="切换香港路线日期">
+    <button class="map-day-btn active" type="button" data-day="day1">Day 1 九龙半岛</button>
+    <button class="map-day-btn" type="button" data-day="day2">Day 2 港岛中环</button>
+  </div>
+  <div class="map-layout">
+    <div class="map-card">
+      <div id="hk-map" class="travel-map" aria-label="香港旅行点位地图"></div>
+      <p class="map-fallback" id="hk-map-fallback">如果地图瓦片加载失败，下面的点位和路线文字仍然可用；实时路线请点击外部地图导航。</p>
+    </div>
+    <aside class="place-panel" aria-live="polite">
+      <div class="place-detail" id="hk-place-detail"></div>
+      <div class="place-list" id="hk-place-list"></div>
+    </aside>
+  </div>
+  <div class="route-panel" id="hk-route-panel"></div>
+</section>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const HK_MAP_DATA = {
+  day1: {
+    center: [22.3025, 114.1692],
+    zoom: 14,
+    places: [
+      {id:"west-kowloon", name:"西九龙文化区", type:"景点", lat:22.3020, lng:114.1608, address:"香港九龙西九文化区", stay:"60-90 分钟", note:"先看艺术公园和维港西侧视角；想看展再买 M+ 或香港故宫票。"},
+      {id:"mplus", name:"M+", type:"景点", lat:22.3027, lng:114.1596, address:"38 Museum Drive, West Kowloon Cultural District, Hong Kong", stay:"60-120 分钟", note:"屋顶花园和公共区适合轻量打卡；看展需预留更久。"},
+      {id:"palace", name:"香港故宫文化博物馆", type:"景点", lat:22.3038, lng:114.1591, address:"8 Museum Drive, West Kowloon Cultural District, Hong Kong", stay:"90-150 分钟", note:"和 M+ 二选一更舒服，不建议两馆都硬塞。"},
+      {id:"tst-promenade", name:"尖沙咀海滨", type:"景点", lat:22.2935, lng:114.1722, address:"Tsim Sha Tsui Promenade, Kowloon, Hong Kong", stay:"45-75 分钟", note:"中午前人少，下午游客变多；顺路串星光大道、钟楼和海港城外侧。"},
+      {id:"k11", name:"K11 MUSEA", type:"景点", lat:22.2946, lng:114.1730, address:"18 Salisbury Road, Tsim Sha Tsui, Hong Kong", stay:"30-60 分钟", note:"室内补给和拍照点，适合天气热或下雨时调整。"},
+      {id:"avenue", name:"星光大道", type:"景点", lat:22.2932, lng:114.1750, address:"Avenue of Stars, Tsim Sha Tsui, Hong Kong", stay:"30-45 分钟", note:"维港视野好，傍晚和夜景人会明显增加。"},
+      {id:"jordan", name:"佐敦", type:"交通", lat:22.3045, lng:114.1716, address:"Jordan, Kowloon, Hong Kong", stay:"午餐转场", note:"尖沙咀到佐敦可步行或 MTR 一站，适合午餐和甜品。"},
+      {id:"yau-ma-tei-fruit", name:"油麻地果栏", type:"景点", lat:22.3108, lng:114.1702, address:"Waterloo Road, Yau Ma Tei, Kowloon, Hong Kong", stay:"20-35 分钟", note:"拍街景不要挡摊主做生意，不建议拖行李。"},
+      {id:"temple-street", name:"庙街", type:"景点", lat:22.3078, lng:114.1698, address:"Temple Street, Yau Ma Tei, Kowloon, Hong Kong", stay:"30-60 分钟", note:"更适合晚上逛；白天可作为油麻地街区顺路点。"},
+      {id:"mong-kok", name:"旺角", type:"景点", lat:22.3193, lng:114.1694, address:"Mong Kok, Kowloon, Hong Kong", stay:"90-150 分钟", note:"金鱼街、女人街、波鞋街、朗豪坊可按体力取舍。"},
+      {id:"kam-wah", name:"金华冰厅", type:"小吃甜品", lat:22.3222, lng:114.1697, address:"45-47 Bute Street, Mong Kok, Hong Kong", stay:"20-40 分钟", note:"菠萝油和奶茶经典；高峰期拼桌正常。"},
+      {id:"feijie", name:"肥姐小食店", type:"小吃甜品", lat:22.3160, lng:114.1705, address:"Dundas Street area, Mong Kok, Hong Kong", stay:"15-25 分钟", note:"卤味串适合浅尝；肠胃敏感别空腹吃太多内脏类。"},
+      {id:"kaika", name:"佳佳甜品", type:"小吃甜品", lat:22.3050, lng:114.1710, address:"Ning Po Street / Parkes Street area, Jordan, Hong Kong", stay:"20-35 分钟", note:"黑芝麻糊、杏仁露更稳，适合 Day 1 晚上收尾。"},
+      {id:"star-tst", name:"尖沙咀天星码头/维港夜景", type:"交通", lat:22.2931, lng:114.1689, address:"Star Ferry Pier, Tsim Sha Tsui, Hong Kong", stay:"30-60 分钟", note:"最稳的维港收尾点；20:00 前后人多。"}
+    ],
+    segments: [
+      {from:"西九龙", to:"尖沙咀海滨", mode:"步行 + 短程巴士/MTR 备用", time:"25-40 分钟", food:"K11 MUSEA 可补水、简餐；不建议为餐厅专门绕路。", tip:"沿海滨走更舒服，暴晒或下雨就改短程交通。", focus:["west-kowloon","tst-promenade"]},
+      {from:"尖沙咀", to:"佐敦午餐/佳佳甜品", mode:"步行或 MTR 一站", time:"10-20 分钟", food:"麦文记、十八座狗仔粉、太平馆；饭后可接佳佳甜品。", tip:"热门店排队超过 25 分钟直接换备选。", focus:["tst-promenade","jordan","kaika"]},
+      {from:"佐敦", to:"油麻地果栏/庙街", mode:"步行为主", time:"15-25 分钟", food:"路上以糖水、小吃补给为主，别连续冰饮。", tip:"油麻地街景适合轻装，别拖行李。", focus:["jordan","yau-ma-tei-fruit","temple-street"]},
+      {from:"油麻地", to:"旺角扫街", mode:"沿弥敦道步行或 MTR 一站", time:"15-25 分钟", food:"金华冰厅、肥姐小食店、红豆烘焙可顺路吃。", tip:"旺角人多，手机和包看好。", focus:["temple-street","mong-kok","kam-wah","feijie"]},
+      {from:"旺角", to:"尖沙咀维港夜景", mode:"MTR 旺角/油麻地 -> 尖沙咀", time:"20-30 分钟", food:"体力够可回尖沙咀看夜景；累了就在庙街/旺角结束。", tip:"不要为了夜景把自己走崩，维港可 Day 2 用天星小轮补。", focus:["mong-kok","star-tst"]}
+    ]
+  },
+  day2: {
+    center: [22.2816, 114.1578],
+    zoom: 14,
+    places: [
+      {id:"central-station", name:"中环站/香港站", type:"交通", lat:22.2819, lng:114.1584, address:"Central Station, Hong Kong", stay:"集合/转场", note:"早餐、中环街区和天星小轮的核心起点。"},
+      {id:"central-market", name:"中环街市", type:"景点", lat:22.2844, lng:114.1556, address:"93 Queen's Road Central, Central, Hong Kong", stay:"30-45 分钟", note:"适合开场补给和拍室内空间。"},
+      {id:"mid-levels", name:"半山扶梯", type:"景点", lat:22.2829, lng:114.1537, address:"Central-Mid-Levels Escalator, Central, Hong Kong", stay:"20-40 分钟", note:"扶梯方向会变，现场看标识；沿线顺路接嘉咸街壁画。"},
+      {id:"graham", name:"嘉咸街壁画", type:"景点", lat:22.2839, lng:114.1522, address:"Graham Street, Central, Hong Kong", stay:"15-25 分钟", note:"热门拍照点，拍完就走，不要在路口久站。"},
+      {id:"stone-slab", name:"石板街", type:"景点", lat:22.2812, lng:114.1550, address:"Pottinger Street, Central, Hong Kong", stay:"15-25 分钟", note:"雨天石板滑，轻便防滑鞋更重要。"},
+      {id:"taikwun", name:"大馆", type:"景点", lat:22.2815, lng:114.1544, address:"10 Hollywood Road, Central, Hong Kong", stay:"45-90 分钟", note:"公共空间免费，历史建筑和展览适合慢看。"},
+      {id:"fringe", name:"艺穗会", type:"景点", lat:22.2804, lng:114.1552, address:"2 Lower Albert Road, Central, Hong Kong", stay:"10-20 分钟", note:"红白外墙拍照顺路即可。"},
+      {id:"lan-fong-yuen", name:"兰芳园", type:"餐厅", lat:22.2829, lng:114.1530, address:"2 Gage Street, Central, Hong Kong", stay:"25-45 分钟", note:"丝袜奶茶、猪扒包；排队长就换泰昌或 Bakehouse。"},
+      {id:"taicheong", name:"泰昌饼家", type:"小吃甜品", lat:22.2828, lng:114.1540, address:"35 Lyndhurst Terrace, Central, Hong Kong", stay:"10-20 分钟", note:"蛋挞外带最顺路，别为了堂食耗太久。"},
+      {id:"bakehouse", name:"Bakehouse 中环", type:"小吃甜品", lat:22.2813, lng:114.1564, address:"5 Staunton Street / Central area, Hong Kong", stay:"15-30 分钟", note:"可外带做早餐或路上补给，热门时段排队明显。"},
+      {id:"kau-kee", name:"九记牛腩", type:"餐厅", lat:22.2850, lng:114.1531, address:"21 Gough Street, Central, Hong Kong", stay:"35-60 分钟", note:"排队超过 25 分钟就换麦奀记/兰芳园。"},
+      {id:"mak-an-kee", name:"麦奀记", type:"餐厅", lat:22.2842, lng:114.1528, address:"Central / Sheung Wan area, Hong Kong", stay:"30-45 分钟", note:"云吞面作为九记备选更轻松。"},
+      {id:"tram-central", name:"叮叮车中环站点", type:"交通", lat:22.2823, lng:114.1582, address:"Des Voeux Road Central tram stop, Central, Hong Kong", stay:"上车点", note:"后门上、前门下，下车付款；二楼后排看街景。"},
+      {id:"causeway", name:"铜锣湾可选下车点", type:"交通", lat:22.2797, lng:114.1847, address:"Causeway Bay, Hong Kong", stay:"30-60 分钟", note:"叮叮车看街景即可，不一定要在铜锣湾久逛。"},
+      {id:"peak-tram", name:"山顶缆车花园道总站", type:"交通", lat:22.2776, lng:114.1590, address:"33 Garden Road, Central, Hong Kong", stay:"排队/上车", note:"排队太长改巴士或直接天星小轮夜景。"},
+      {id:"victoria-peak", name:"太平山顶", type:"景点", lat:22.2759, lng:114.1455, address:"Victoria Peak, Hong Kong", stay:"60-90 分钟", note:"大雾、低云、暴雨时视野差，别硬上。"},
+      {id:"central-pier7", name:"中环 7 号码头", type:"交通", lat:22.2861, lng:114.1607, address:"Central Pier No.7, Hong Kong", stay:"15-30 分钟", note:"坐天星小轮到尖沙咀，用低成本补一个维港夜景。"}
+    ],
+    segments: [
+      {from:"中环早餐", to:"中环街区", mode:"MTR 到中环/香港站后步行", time:"10-20 分钟", food:"兰芳园、泰昌饼家、Bakehouse 三选一，别三家都排。", tip:"早餐点只选一个，避免拖慢上午节奏。", focus:["central-station","lan-fong-yuen","taicheong","bakehouse","central-market"]},
+      {from:"中环街市", to:"半山扶梯/嘉咸街", mode:"步行 + 半山扶梯", time:"20-35 分钟", food:"路上可外带蛋挞或咖啡，不建议正餐。", tip:"扶梯方向会变；雨天石板街防滑。", focus:["central-market","mid-levels","graham","stone-slab"]},
+      {from:"嘉咸街/石板街", to:"大馆/艺穗会", mode:"步行", time:"10-20 分钟", food:"拍照后去大馆休息，保留体力。", tip:"坡道多，别穿不跟脚的鞋。", focus:["graham","stone-slab","taikwun","fringe"]},
+      {from:"大馆", to:"中上环午餐", mode:"步行", time:"5-15 分钟", food:"九记牛腩、麦奀记、兰芳园；排队长直接换备选。", tip:"热门店拼桌催单正常，别把午餐排成景点。", focus:["taikwun","kau-kee","mak-an-kee","lan-fong-yuen"]},
+      {from:"中环", to:"叮叮车东行", mode:"叮叮车", time:"30-60 分钟", food:"车上不要饮食；到湾仔/铜锣湾再补给。", tip:"后门上、前门下，下车付款。", focus:["tram-central","causeway"]},
+      {from:"中环", to:"山顶或天星小轮", mode:"山顶缆车/巴士/天星小轮", time:"45-90 分钟", food:"天气好上山顶；排队或大雾就改中环 7 号码头坐天星小轮。", tip:"山顶是天气项目，不是必做项目。", focus:["peak-tram","victoria-peak","central-pier7"]}
+    ]
+  }
+};
+
+function hkMapSearchUrl(provider, place) {
+  const query = encodeURIComponent(`${place.name} ${place.address}`);
+  if (provider === "google") return `https://www.google.com/maps/search/?api=1&query=${query}`;
+  if (provider === "baidu") return `https://map.baidu.com/search/${query}`;
+  return `https://uri.amap.com/search?keyword=${query}`;
+}
+
+(function initHongKongMap() {
+  const detail = document.getElementById("hk-place-detail");
+  const list = document.getElementById("hk-place-list");
+  const routes = document.getElementById("hk-route-panel");
+  const buttons = Array.from(document.querySelectorAll(".map-day-btn"));
+  if (!detail || !list || !routes) return;
+
+  let currentDay = "day1";
+  let map = null;
+  let layer = null;
+  let markers = {};
+
+  const typeClass = {"景点":"spot","餐厅":"food","小吃甜品":"sweet","交通":"transport"};
+  const typeLabel = {"景点":"景", "餐厅":"餐", "小吃甜品":"甜", "交通":"行"};
+
+  function renderDetail(place) {
+    detail.innerHTML = `
+      <span class="place-type ${typeClass[place.type] || "spot"}">${place.type}</span>
+      <h3>${place.name}</h3>
+      <p>${place.note}</p>
+      <dl>
+        <dt>地址</dt><dd>${place.address}</dd>
+        <dt>建议停留</dt><dd>${place.stay}</dd>
+      </dl>
+      <div class="nav-links">
+        <a href="${hkMapSearchUrl("google", place)}" target="_blank" rel="noopener">Google</a>
+        <a href="${hkMapSearchUrl("baidu", place)}" target="_blank" rel="noopener">百度</a>
+        <a href="${hkMapSearchUrl("amap", place)}" target="_blank" rel="noopener">高德</a>
+      </div>`;
+  }
+
+  function iconFor(place) {
+    return L.divIcon({
+      className: `hk-marker ${typeClass[place.type] || "spot"}`,
+      html: `<span>${typeLabel[place.type] || "点"}</span>`,
+      iconSize: [30, 30],
+      iconAnchor: [15, 15]
+    });
+  }
+
+  function focusPlaces(ids) {
+    if (!map || !ids || !ids.length) return;
+    const points = ids.map(id => markers[id]).filter(Boolean).map(marker => marker.getLatLng());
+    if (points.length === 1) map.setView(points[0], 16);
+    if (points.length > 1) map.fitBounds(L.latLngBounds(points), {padding: [42, 42]});
+  }
+
+  function renderRoutes(data) {
+    routes.innerHTML = data.segments.map((segment, index) => `
+      <article class="route-segment" tabindex="0" data-focus="${segment.focus.join(",")}">
+        <div class="route-index">${index + 1}</div>
+        <div>
+          <h3>${segment.from} <span>-></span> ${segment.to}</h3>
+          <p><b>推荐交通：</b>${segment.mode}；<b>预计：</b>${segment.time}</p>
+          <p><b>顺路吃喝：</b>${segment.food}</p>
+          <p class="meta"><b>避雷：</b>${segment.tip}</p>
+        </div>
+      </article>`).join("");
+    Array.from(routes.querySelectorAll(".route-segment")).forEach(card => {
+      const handler = () => focusPlaces(card.dataset.focus.split(","));
+      card.addEventListener("click", handler);
+      card.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          handler();
+        }
+      });
+    });
+  }
+
+  function renderDay(day) {
+    currentDay = day;
+    const data = HK_MAP_DATA[day];
+    buttons.forEach(btn => btn.classList.toggle("active", btn.dataset.day === day));
+    list.innerHTML = data.places.map(place => `
+      <button class="place-chip" type="button" data-id="${place.id}">
+        <span class="place-dot ${typeClass[place.type] || "spot"}"></span>
+        <span>${place.name}</span>
+      </button>`).join("");
+    Array.from(list.querySelectorAll(".place-chip")).forEach(chip => {
+      chip.addEventListener("click", () => {
+        const place = data.places.find(item => item.id === chip.dataset.id);
+        if (!place) return;
+        renderDetail(place);
+        if (markers[place.id] && map) {
+          map.setView([place.lat, place.lng], 16);
+          markers[place.id].openPopup();
+        }
+      });
+    });
+    renderDetail(data.places[0]);
+    renderRoutes(data);
+
+    if (!window.L) return;
+    if (!map) {
+      map = L.map("hk-map", {scrollWheelZoom:false}).setView(data.center, data.zoom);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap"
+      }).addTo(map);
+    }
+    if (layer) layer.remove();
+    layer = L.layerGroup().addTo(map);
+    markers = {};
+    data.places.forEach(place => {
+      const marker = L.marker([place.lat, place.lng], {icon: iconFor(place)})
+        .bindPopup(`<b>${place.name}</b><br>${place.address}`)
+        .on("click", () => renderDetail(place));
+      marker.addTo(layer);
+      markers[place.id] = marker;
+    });
+    map.setView(data.center, data.zoom);
+    setTimeout(() => map.invalidateSize(), 120);
+  }
+
+  buttons.forEach(btn => btn.addEventListener("click", () => renderDay(btn.dataset.day)));
+  renderDay(currentDay);
+})();
+</script>
 <section class="section">
   <div class="section-head"><h2>Day 1: 九龙半岛经典线</h2></div>
   <div class="timeline"><article class="slot">
