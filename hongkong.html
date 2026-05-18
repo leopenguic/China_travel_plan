@@ -38,6 +38,7 @@
     <button class="map-day-btn active" type="button" data-day="day1">Day 1 九龙半岛</button>
     <button class="map-day-btn" type="button" data-day="day2">Day 2 港岛中环</button>
   </div>
+  <div class="day-route-actions" id="hk-day-route-actions"></div>
   <div class="map-layout">
     <div class="map-card">
       <div id="hk-map" class="travel-map" aria-label="香港旅行点位地图"></div>
@@ -56,6 +57,9 @@ const HK_MAP_DATA = {
   day1: {
     center: [22.3025, 114.1692],
     zoom: 14,
+    routeSummary: "西九龙 -> 尖沙咀 -> 佐敦 -> 油麻地 -> 旺角 -> 尖沙咀维港夜景",
+    mainRoute: ["west-kowloon","tst-promenade","k11","avenue","jordan","kaika","yau-ma-tei-fruit","temple-street","moko","mong-kok-footbridge","goldfish","kam-wah","langham","ladies-market","feijie","star-tst"],
+    navRoute: ["west-kowloon","tst-promenade","jordan","yau-ma-tei-fruit","temple-street","moko","mong-kok-footbridge","kam-wah","ladies-market","star-tst"],
     places: [
       {id:"west-kowloon", name:"西九龙文化区", type:"景点", lat:22.3020, lng:114.1608, address:"香港九龙西九文化区", stay:"60-90 分钟", note:"先看艺术公园和维港西侧视角；想看展再买 M+ 或香港故宫票。"},
       {id:"mplus", name:"M+", type:"景点", lat:22.3027, lng:114.1596, address:"38 Museum Drive, West Kowloon Cultural District, Hong Kong", stay:"60-120 分钟", note:"屋顶花园和公共区适合轻量打卡；看展需预留更久。"},
@@ -106,6 +110,9 @@ const HK_MAP_DATA = {
   day2: {
     center: [22.2816, 114.1578],
     zoom: 14,
+    routeSummary: "中环站 -> 中环街市 -> 半山扶梯 -> 大馆 -> 中上环午餐 -> 叮叮车 -> 山顶/天星小轮",
+    mainRoute: ["central-station","central-market","mid-levels","graham","stone-slab","taikwun","fringe","kau-kee","tram-central","causeway","peak-tram","victoria-peak","central-pier7"],
+    navRoute: ["central-station","central-market","mid-levels","graham","taikwun","kau-kee","tram-central","causeway","peak-tram","central-pier7"],
     places: [
       {id:"central-station", name:"中环站/香港站", type:"交通", lat:22.2819, lng:114.1584, address:"Central Station, Hong Kong", stay:"集合/转场", note:"早餐、中环街区和天星小轮的核心起点。"},
       {id:"central-market", name:"中环街市", type:"景点", lat:22.2844, lng:114.1556, address:"93 Queen's Road Central, Central, Hong Kong", stay:"30-45 分钟", note:"适合开场补给和拍室内空间。"},
@@ -143,16 +150,35 @@ function hkMapSearchUrl(provider, place) {
   return `https://uri.amap.com/search?keyword=${query}`;
 }
 
+function hkDayRouteUrl(provider, data) {
+  const routeIds = data.navRoute || data.mainRoute;
+  const points = routeIds.map(id => data.places.find(place => place.id === id)).filter(Boolean);
+  const routeText = data.routeSummary || points.map(place => place.name).join(" -> ");
+  if (!points.length) return "#";
+  if (provider === "google") {
+    const origin = encodeURIComponent(`${points[0].name} ${points[0].address}`);
+    const destination = encodeURIComponent(`${points[points.length - 1].name} ${points[points.length - 1].address}`);
+    const waypoints = points.slice(1, -1).map(place => `${place.name} ${place.address}`).join("|");
+    return `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&waypoints=${encodeURIComponent(waypoints)}&travelmode=walking`;
+  }
+  const query = encodeURIComponent(`香港 ${routeText}`);
+  if (provider === "baidu") return `https://map.baidu.com/search/${query}`;
+  return `https://uri.amap.com/search?keyword=${query}`;
+}
+
 (function initHongKongMap() {
   const detail = document.getElementById("hk-place-detail");
   const list = document.getElementById("hk-place-list");
   const routes = document.getElementById("hk-route-panel");
+  const dayRouteActions = document.getElementById("hk-day-route-actions");
   const buttons = Array.from(document.querySelectorAll(".map-day-btn"));
-  if (!detail || !list || !routes) return;
+  if (!detail || !list || !routes || !dayRouteActions) return;
 
   let currentDay = "day1";
   let map = null;
   let layer = null;
+  let routeLine = null;
+  let routeHalo = null;
   let markers = {};
 
   const typeClass = {"景点":"spot","餐厅":"food","小吃甜品":"sweet","交通":"transport"};
@@ -189,6 +215,48 @@ function hkMapSearchUrl(provider, place) {
     const points = ids.map(id => markers[id]).filter(Boolean).map(marker => marker.getLatLng());
     if (points.length === 1) map.setView(points[0], 16);
     if (points.length > 1) map.fitBounds(L.latLngBounds(points), {padding: [42, 42]});
+  }
+
+  function routePoints(data) {
+    return (data.mainRoute || [])
+      .map(id => data.places.find(place => place.id === id))
+      .filter(Boolean)
+      .map(place => [place.lat, place.lng]);
+  }
+
+  function fitMainRoute(data) {
+    if (!map) return;
+    const points = routePoints(data);
+    if (points.length > 1) map.fitBounds(L.latLngBounds(points), {padding: [34, 34]});
+  }
+
+  function drawMainRoute(data) {
+    if (!map) return;
+    if (routeLine) routeLine.remove();
+    if (routeHalo) routeHalo.remove();
+    const points = routePoints(data);
+    if (points.length < 2) return;
+    routeHalo = L.polyline(points, {color:"#ffffff", weight:9, opacity:.9, lineJoin:"round"}).addTo(map);
+    routeLine = L.polyline(points, {color:"#0f766e", weight:5, opacity:.92, lineJoin:"round"}).addTo(map);
+    routeLine.bringToBack();
+    routeHalo.bringToBack();
+  }
+
+  function renderDayRouteActions(data) {
+    dayRouteActions.innerHTML = `
+      <div class="route-summary">
+        <strong>整日主路线</strong>
+        <span>${data.routeSummary}</span>
+      </div>
+      <div class="route-action-buttons">
+        <button class="fit-route-btn" type="button">查看整日路线</button>
+        <a href="${hkDayRouteUrl("google", data)}" target="_blank" rel="noopener">Google 多点路线</a>
+        <a href="${hkDayRouteUrl("baidu", data)}" target="_blank" rel="noopener">百度路线搜索</a>
+        <a href="${hkDayRouteUrl("amap", data)}" target="_blank" rel="noopener">高德路线搜索</a>
+      </div>
+      <p>站内线条是核心停靠点参考线；真实步行、公交、打车时间以当天地图 App 为准。小吃店作为沿途加餐点，不强制全部进入导航。</p>`;
+    const fitButton = dayRouteActions.querySelector(".fit-route-btn");
+    if (fitButton) fitButton.addEventListener("click", () => fitMainRoute(data));
   }
 
   function renderRoutes(data) {
@@ -236,6 +304,7 @@ function hkMapSearchUrl(provider, place) {
     });
     renderDetail(data.places[0]);
     renderRoutes(data);
+    renderDayRouteActions(data);
 
     if (!window.L) return;
     if (!map) {
@@ -255,7 +324,8 @@ function hkMapSearchUrl(provider, place) {
       marker.addTo(layer);
       markers[place.id] = marker;
     });
-    map.setView(data.center, data.zoom);
+    drawMainRoute(data);
+    fitMainRoute(data);
     setTimeout(() => map.invalidateSize(), 120);
   }
 
