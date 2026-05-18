@@ -66,17 +66,40 @@ const HK_MAP_DATA = {
       {id:"jordan", name:"佐敦", type:"交通", lat:22.3045, lng:114.1716, address:"Jordan, Kowloon, Hong Kong", stay:"午餐转场", note:"尖沙咀到佐敦可步行或 MTR 一站，适合午餐和甜品。"},
       {id:"yau-ma-tei-fruit", name:"油麻地果栏", type:"景点", lat:22.3108, lng:114.1702, address:"Waterloo Road, Yau Ma Tei, Kowloon, Hong Kong", stay:"20-35 分钟", note:"拍街景不要挡摊主做生意，不建议拖行李。"},
       {id:"temple-street", name:"庙街", type:"景点", lat:22.3078, lng:114.1698, address:"Temple Street, Yau Ma Tei, Kowloon, Hong Kong", stay:"30-60 分钟", note:"更适合晚上逛；白天可作为油麻地街区顺路点。"},
-      {id:"mong-kok", name:"旺角", type:"景点", lat:22.3193, lng:114.1694, address:"Mong Kok, Kowloon, Hong Kong", stay:"90-150 分钟", note:"金鱼街、女人街、波鞋街、朗豪坊可按体力取舍。"},
-      {id:"kam-wah", name:"金华冰厅", type:"小吃甜品", lat:22.3222, lng:114.1697, address:"45-47 Bute Street, Mong Kok, Hong Kong", stay:"20-40 分钟", note:"菠萝油和奶茶经典；高峰期拼桌正常。"},
-      {id:"feijie", name:"肥姐小食店", type:"小吃甜品", lat:22.3160, lng:114.1705, address:"Dundas Street area, Mong Kok, Hong Kong", stay:"15-25 分钟", note:"卤味串适合浅尝；肠胃敏感别空腹吃太多内脏类。"},
-      {id:"kaika", name:"佳佳甜品", type:"小吃甜品", lat:22.3050, lng:114.1710, address:"Ning Po Street / Parkes Street area, Jordan, Hong Kong", stay:"20-35 分钟", note:"黑芝麻糊、杏仁露更稳，适合 Day 1 晚上收尾。"},
+      {id:"mong-kok", name:"旺角", type:"景点", lat:22.3193, lng:114.1694, address:"Mong Kok, Kowloon, Hong Kong", stay:"90-180 分钟", note:"补充攻略建议从新世纪广场、旺角天桥、金鱼街、朗豪坊一路扫到女人街和信和中心。"},
+      {id:"moko", name:"旺角新世纪广场", type:"景点", lat:22.3234, lng:114.1722, address:"MOKO, 193 Prince Edward Road West, Mong Kok, Hong Kong", stay:"20-40 分钟", note:"东铁旺角东站直连，适合从这里开始旺角逛吃；二手店和商场动线可以简单逛。"},
+      {id:"mong-kok-footbridge", name:"旺角天桥", type:"景点", lat:22.3208, lng:114.1711, address:"Mong Kok Footbridge, Mong Kok, Hong Kong", stay:"15-30 分钟", note:"港风照片点，通菜街、花园街、西洋菜街都可以顺路拍。"},
+      {id:"goldfish", name:"金鱼街", type:"景点", lat:22.3224, lng:114.1696, address:"Tung Choi Street North, Mong Kok, Hong Kong", stay:"20-30 分钟", note:"观赏鱼店密集，适合拍街景；店内拍照先看现场规则。"},
+      {id:"langham", name:"朗豪坊", type:"景点", lat:22.3180, lng:114.1687, address:"8 Argyle Street, Mong Kok, Hong Kong", stay:"30-60 分钟", note:"商场、电梯和旋转式楼层动线可打卡，适合中途休息。"},
+      {id:"ladies-market", name:"女人街", type:"景点", lat:22.3168, lng:114.1706, address:"Tung Choi Street, Mong Kok, Hong Kong", stay:"30-60 分钟", note:"露天市场氛围强，适合体验和拍街景，购物别急着第一家买。"},
+      {id:"sino-centre", name:"信和中心", type:"景点", lat:22.3161, lng:114.1702, address:"582-592 Nathan Road, Mong Kok, Hong Kong", stay:"30-60 分钟", note:"唱片、手办、二次元周边、小玩具多；建筑较旧，体感会比较挤。"},
+      {id:"kam-wah", name:"金华冰厅", type:"小吃甜品", lat:22.3222, lng:114.1697, address:"45-47 Bute Street, Mong Kok, Hong Kong", stay:"20-40 分钟", note:"传统老店，补充攻略强推。", recommend:"菠萝油、奶茶；想吃正餐可加干炒牛河，冻鸳鸯偏甜。"},
+      {id:"wa-sing", name:"华星冰室", type:"小吃甜品", lat:22.3196, lng:114.1700, address:"Mong Kok, Hong Kong", stay:"25-45 分钟", note:"港式茶餐厅代表，很多明星打卡。", recommend:"炒蛋、多士、奶茶；排队久就换金华或通达食店。"},
+      {id:"red-bean", name:"红豆烘焙", type:"小吃甜品", lat:22.3192, lng:114.1708, address:"Mong Kok, Hong Kong", stay:"10-20 分钟", note:"补充攻略写在朗豪坊旁边，适合边走边吃。", recommend:"杨枝甘露布丁面包，酥脆香甜，建议外带。"},
+      {id:"field-bookstore", name:"田园书屋", type:"景点", lat:22.3175, lng:114.1701, address:"Mong Kok, Hong Kong", stay:"15-35 分钟", note:"闹市区安静书屋，港版繁体书为主，不感兴趣可以路过。"},
+      {id:"cookie-quartet", name:"曲奇四重奏", type:"小吃甜品", lat:22.3166, lng:114.1700, address:"Mong Kok, Hong Kong", stay:"10-20 分钟", note:"补充攻略写路过被奶香吸引，价格不便宜，适合试吃/少买。", recommend:"蝴蝶酥、曲奇；预算紧就试吃或小份买。"},
+      {id:"feijie", name:"肥姐小食店", type:"小吃甜品", lat:22.3160, lng:114.1705, address:"Dundas Street area, Mong Kok, Hong Kong", stay:"15-25 分钟", note:"路边摊小吃店，人气很旺；注意只收现金。", recommend:"卤串、鸡胗、牛肚；芥末酱是特色，口味重。"},
+      {id:"kaika", name:"佳佳甜品", type:"小吃甜品", lat:22.3050, lng:114.1710, address:"Ning Po Street / Parkes Street area, Jordan, Hong Kong", stay:"20-35 分钟", note:"在肥姐附近/佐敦一带可作为甜品收尾，建议先甜品再卤串。", recommend:"芝麻糊、核桃糊、汤圆；汤底有花生香。"},
+      {id:"yau-ma-tei-police", name:"油麻地警署旧址", type:"景点", lat:22.3103, lng:114.1697, address:"Yau Ma Tei Police Station, Kowloon, Hong Kong", stay:"10-20 分钟", note:"导航注意选旧址，适合拍照打卡，节假日人多。"},
+      {id:"chicken-wing-mountain", name:"鸡翼山", type:"小吃甜品", lat:22.3210, lng:114.1688, address:"Mong Kok, Hong Kong", stay:"15-25 分钟", note:"小店人气高，补充攻略写以多款秘制鸡翼出名。", recommend:"网红炸鸡翼；适合分着吃，别和卤味都点太多。"},
+      {id:"quirky-bakery", name:"奇趣饼家", type:"小吃甜品", lat:22.3216, lng:114.1714, address:"Mong Kok, Hong Kong", stay:"10-20 分钟", note:"中式饼店，价格亲民。", recommend:"鸡仔饼、老婆饼。"},
+      {id:"ming-wah", name:"明华饼家", type:"小吃甜品", lat:22.3156, lng:114.1711, address:"Mong Kok, Hong Kong", stay:"10-20 分钟", note:"补充图写评价不错。", recommend:"传统中式饼、老婆饼、鸡仔饼。"},
+      {id:"hokkaido-cake", name:"北海道牛乳蛋糕", type:"小吃甜品", lat:22.3159, lng:114.1713, address:"Mong Kok, Hong Kong", stay:"10-15 分钟", note:"适合甜品补给。", recommend:"北海道牛乳蛋糕。"},
+      {id:"two-grass", name:"两草", type:"小吃甜品", lat:22.3164, lng:114.1726, address:"Mong Kok, Hong Kong", stay:"15-25 分钟", note:"袁咏仪爱吃的甜品店，补充图写好好吃。", recommend:"杨枝甘露、芒果类甜品。"},
+      {id:"tong-da", name:"通达食店", type:"餐厅", lat:22.3230, lng:114.1702, address:"Mong Kok, Hong Kong", stay:"30-50 分钟", note:"老式港式茶餐厅，分量足、价格亲民。", recommend:"家常小炒、碟头饭、云吞面。"},
+      {id:"kang-nian", name:"康年餐厅", type:"餐厅", lat:22.3200, lng:114.1715, address:"Mong Kok, Hong Kong", stay:"30-50 分钟", note:"主打碟头饭、炒粉面和奶茶，出餐快。", recommend:"碟头饭、炒粉面、奶茶。"},
+      {id:"woman-street-food", name:"女人街食饭公司", type:"餐厅", lat:22.3169, lng:114.1706, address:"Ladies Market area, Mong Kok, Hong Kong", stay:"35-60 分钟", note:"经典家常小菜与碟头饭，口味地道，上菜快。", recommend:"家常小菜、碟头饭。"},
+      {id:"cha-tra-mue", name:"Cha Tra Mue", type:"小吃甜品", lat:22.3158, lng:114.1692, address:"Mong Kok, Hong Kong", stay:"10-20 分钟", note:"泰式饮品店，适合逛累时补一杯。", recommend:"泰奶、泰式柠檬茶。"},
       {id:"star-tst", name:"尖沙咀天星码头/维港夜景", type:"交通", lat:22.2931, lng:114.1689, address:"Star Ferry Pier, Tsim Sha Tsui, Hong Kong", stay:"30-60 分钟", note:"最稳的维港收尾点；20:00 前后人多。"}
     ],
     segments: [
       {from:"西九龙", to:"尖沙咀海滨", mode:"步行 + 短程巴士/MTR 备用", time:"25-40 分钟", food:"K11 MUSEA 可补水、简餐；不建议为餐厅专门绕路。", tip:"沿海滨走更舒服，暴晒或下雨就改短程交通。", focus:["west-kowloon","tst-promenade"]},
       {from:"尖沙咀", to:"佐敦午餐/佳佳甜品", mode:"步行或 MTR 一站", time:"10-20 分钟", food:"麦文记、十八座狗仔粉、太平馆；饭后可接佳佳甜品。", tip:"热门店排队超过 25 分钟直接换备选。", focus:["tst-promenade","jordan","kaika"]},
       {from:"佐敦", to:"油麻地果栏/庙街", mode:"步行为主", time:"15-25 分钟", food:"路上以糖水、小吃补给为主，别连续冰饮。", tip:"油麻地街景适合轻装，别拖行李。", focus:["jordan","yau-ma-tei-fruit","temple-street"]},
-      {from:"油麻地", to:"旺角扫街", mode:"沿弥敦道步行或 MTR 一站", time:"15-25 分钟", food:"金华冰厅、肥姐小食店、红豆烘焙可顺路吃。", tip:"旺角人多，手机和包看好。", focus:["temple-street","mong-kok","kam-wah","feijie"]},
+      {from:"油麻地", to:"旺角新世纪广场/天桥", mode:"步行或 MTR/东铁短转", time:"15-30 分钟", food:"从旺角东/新世纪广场开逛，先拍天桥、金鱼街，再进旺角核心。", tip:"旺角动线密，先定 3-5 个必去点，不要见店就排。", focus:["yau-ma-tei-fruit","yau-ma-tei-police","moko","mong-kok-footbridge","goldfish"]},
+      {from:"旺角天桥", to:"金华冰厅/朗豪坊", mode:"步行", time:"20-35 分钟", food:"金华冰厅点菠萝油、奶茶；红豆烘焙点杨枝甘露布丁面包。", tip:"金华排队过长就换华星冰室或通达食店。", focus:["mong-kok-footbridge","kam-wah","wa-sing","langham","red-bean"]},
+      {from:"朗豪坊", to:"田园书屋/信和中心", mode:"步行", time:"15-30 分钟", food:"曲奇四重奏可试蝴蝶酥；Cha Tra Mue 可补泰奶。", tip:"信和中心空间较挤，贵重物品看好。", focus:["langham","field-bookstore","sino-centre","cookie-quartet","cha-tra-mue"]},
+      {from:"女人街", to:"肥姐小食店/佳佳甜品", mode:"步行", time:"15-25 分钟", food:"肥姐点卤串、鸡胗、牛肚；佳佳点芝麻糊、核桃糊、汤圆。", tip:"肥姐只收现金；建议先甜品再卤串，肠胃更舒服。", focus:["ladies-market","feijie","kaika","woman-street-food"]},
       {from:"旺角", to:"尖沙咀维港夜景", mode:"MTR 旺角/油麻地 -> 尖沙咀", time:"20-30 分钟", food:"体力够可回尖沙咀看夜景；累了就在庙街/旺角结束。", tip:"不要为了夜景把自己走崩，维港可 Day 2 用天星小轮补。", focus:["mong-kok","star-tst"]}
     ]
   },
@@ -143,6 +166,7 @@ function hkMapSearchUrl(provider, place) {
       <dl>
         <dt>地址</dt><dd>${place.address}</dd>
         <dt>建议停留</dt><dd>${place.stay}</dd>
+        ${place.recommend ? `<dt>推荐小吃</dt><dd>${place.recommend}</dd>` : ""}
       </dl>
       <div class="nav-links">
         <a href="${hkMapSearchUrl("google", place)}" target="_blank" rel="noopener">Google</a>
@@ -258,7 +282,7 @@ function hkMapSearchUrl(provider, place) {
   <div><h3>旺角</h3><p>旺角天桥、金鱼街、女人街、波鞋街、朗豪坊、信和中心。</p><p class="meta"><b>交通:</b> 沿弥敦道北上或 MTR 到旺角</p><p class="meta"><b>费用/提醒:</b> 免费；人流密集，手机和包看好</p></div>
 </article><article class="slot">
   <div class="time">17:30</div>
-  <div><h3>旺角吃喝</h3><p>金华冰厅菠萝油；肥姐小食店卤串；红豆烘焙/曲奇四重奏可做顺路补给。</p><p class="meta"><b>交通:</b> 步行</p><p class="meta"><b>费用/提醒:</b> HK$30-120；准备零钱</p></div>
+  <div><h3>旺角逛吃支线</h3><p>按补充图片路线：新世纪广场 -&gt; 旺角天桥 -&gt; 金华冰厅 -&gt; 朗豪坊/红豆烘焙 -&gt; 田园书屋/信和中心 -&gt; 曲奇四重奏 -&gt; 肥姐小食店/佳佳甜品。</p><p class="meta"><b>交通:</b> 步行；点位密集，不建议打车</p><p class="meta"><b>费用/提醒:</b> HK$30-180；肥姐只收现金，甜品和卤味别连续猛吃</p></div>
 </article><article class="slot">
   <div class="time">19:30</div>
   <div><h3>维港夜景</h3><p>回尖沙咀看夜景，或在庙街吃完再散步到海旁。体力不足就取消回海旁。</p><p class="meta"><b>交通:</b> MTR 旺角/油麻地 -&gt; 尖沙咀</p><p class="meta"><b>费用/提醒:</b> 免费；20:00 前后人多</p></div>
@@ -267,6 +291,21 @@ function hkMapSearchUrl(provider, place) {
 <section class="section">
   <div class="section-head"><h2>Day 1 顺路食店和小吃</h2></div>
   <ul class="check-list"><li>金华冰厅：45-47 Bute Street, Mong Kok。点菠萝油、奶茶；高峰期拼桌很正常。</li><li>肥姐小食店：旺角登打士街一带。卤味串适合浅尝，芥末酱有冲劲；肠胃敏感者别空腹吃太多内脏类。</li><li>佳佳甜品：Jordan Parkes Street 一带。适合 Day 1 晚上作为收尾，黑芝麻糊、杏仁露更稳。</li><li>曲奇四重奏/伴手礼小店：顺路补充，不建议专门绕路；价格不低，先试吃再买。</li></ul>
+</section>
+<section class="section">
+  <div class="section-head"><h2>旺角逛吃补充：推荐小吃和甜品</h2><p class="section-intro">根据你补充的旺角一日游图片整理；店铺营业状态、准确门牌和排队情况以当天地图 App 为准。</p></div>
+  <div class="table-wrap"><table><thead><tr><th>店/点位</th><th>推荐小吃/甜品</th><th>怎么放进行程</th><th>提醒</th></tr></thead><tbody><tr><td>金华冰厅</td><td>菠萝油、奶茶；可加干炒牛河，冻鸳鸯略甜</td><td>旺角天桥/金鱼街后接，作为下午茶或早晚餐补给</td><td>传统老店人气高，排队过长就换备选。</td></tr>
+<tr><td>红豆烘焙</td><td>杨枝甘露布丁面包</td><td>朗豪坊旁边顺路外带</td><td>外带即可，不要为它打乱主线。</td></tr>
+<tr><td>肥姐小食店</td><td>卤串、鸡胗、牛肚；芥末酱是特色</td><td>女人街/信和中心后作为咸口小吃</td><td>只收现金；肠胃敏感少吃内脏和冷饮。</td></tr>
+<tr><td>佳佳甜品</td><td>芝麻糊、核桃糊、汤圆</td><td>肥姐附近/佐敦一带收尾，建议先甜品再卤串</td><td>甜品比卤味更适合收尾，排队久就换两草。</td></tr>
+<tr><td>曲奇四重奏</td><td>蝴蝶酥、曲奇</td><td>信和中心/女人街附近路过买伴手礼</td><td>价格不低，先试吃或买小份。</td></tr>
+<tr><td>华星冰室</td><td>炒蛋、多士、奶茶</td><td>金华冰厅排队太久时的茶餐厅备选</td><td>港式茶餐厅也会排队，别连续排两家。</td></tr>
+<tr><td>奇趣饼家/明华饼家</td><td>鸡仔饼、老婆饼、传统中式饼</td><td>金鱼街/旺角核心路过买</td><td>适合少量伴手礼。</td></tr>
+<tr><td>北海道牛乳蛋糕</td><td>北海道牛乳蛋糕</td><td>女人街东侧甜品补给</td><td>和其他甜品二选一，不要一路甜食。</td></tr>
+<tr><td>两草</td><td>杨枝甘露、芒果类甜品</td><td>袁咏仪爱吃的店，可做佳佳备选</td><td>离主线略偏，体力够再去。</td></tr>
+<tr><td>通达食店/康年餐厅</td><td>家常小炒、碟头饭、云吞面、奶茶</td><td>旺角逛累需要正餐时选一家</td><td>不要为了打卡连续吃茶餐厅。</td></tr>
+<tr><td>鸡翼山</td><td>网红炸鸡翼</td><td>多人同行可分食</td><td>炸物和卤味二选一更舒服。</td></tr>
+<tr><td>Cha Tra Mue</td><td>泰奶、泰式柠檬茶</td><td>信和中心附近饮品补给</td><td>甜度较高，别替代喝水。</td></tr></tbody></table></div>
 </section>
 <section class="section">
   <div class="section-head"><h2>Day 2: 港岛中环 + 叮叮车 + 夜景</h2></div>
